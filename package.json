@@ -18,6 +18,7 @@
   "homepage": "https://github.com/mitoyouhei/lottery-sc#readme",
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^2.0.1",
+    "dotenv": "^16.0.3",
     "hardhat": "^2.12.6"
   }
 }
