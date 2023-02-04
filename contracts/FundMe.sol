@@ -50,10 +50,10 @@ contract FundMe {
 
     /// @notice Funds our contract based on the ETH/USD price
     function fund() public payable {
-        require(
-            msg.value.getConversionRate(s_priceFeed) >= MINIMUM_USD,
-            "You need to spend more ETH!"
-        );
+        // require(
+        //     msg.value.getConversionRate(s_priceFeed) >= MINIMUM_USD,
+        //     "You need to spend more ETH!"
+        // );
         // require(PriceConverter.getConversionRate(msg.value) >= MINIMUM_USD, "You need to spend more ETH!");
         s_addressToAmountFunded[msg.sender] += msg.value;
         s_funders.push(msg.sender);
@@ -102,9 +102,9 @@ contract FundMe {
         return s_addressToAmountFunded[fundingAddress];
     }
 
-    function getVersion() public view returns (uint256) {
-        return s_priceFeed.version();
-    }
+    // function getVersion() public view returns (uint256) {
+    //     return s_priceFeed.version();
+    // }
 
     function getFunder(uint256 index) public view returns (address) {
         return s_funders[index];
@@ -114,7 +114,7 @@ contract FundMe {
         return i_owner;
     }
 
-    function getPriceFeed() public view returns (AggregatorV3Interface) {
-        return s_priceFeed;
-    }
+    // function getPriceFeed() public view returns (AggregatorV3Interface) {
+    //     return s_priceFeed;
+    // }
 }
