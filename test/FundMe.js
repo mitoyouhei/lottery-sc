@@ -6,9 +6,7 @@ describe("FundMe contract", function () {
     const FundMe = await ethers.getContractFactory("FundMe");
     const [owner] = await ethers.getSigners();
 
-    const hardhatFundMe = await FundMe.deploy(
-      "0xD4a33860578De61DBAbDc8BFdb98FD742fA7028e"
-    );
+    const hardhatFundMe = await FundMe.deploy();
 
     await hardhatFundMe.deployed();
 

@@ -10,5 +10,9 @@ module.exports = {
       url: process.env.GANACHE_URL,
       accounts: [process.env.GANACHE_DEPLOY_ACCOUNT_PRIVATE_KEY],
     },
+    goerli: {
+      url: process.env.GOERLI_URL,
+      accounts: [process.env.GOERLI_DEPLOY_ACCOUNT_PRIVATE_KEY],
+    },
   },
 };
