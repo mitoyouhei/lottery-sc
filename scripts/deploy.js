@@ -8,10 +8,15 @@ async function main() {
   console.log("Account:", deployer.address);
   console.log("Account balance:", (await deployer.getBalance()).toString());
 
-  const FundMe = await ethers.getContractFactory("FundMe");
-  const fundMe = await FundMe.deploy();
+  // const FundMe = await ethers.getContractFactory("FundMe");
+  // const fundMe = await FundMe.deploy();
 
-  console.log("FundMe address:", fundMe.address);
+  // console.log("FundMe address:", fundMe.address);
+
+  const Dice = await ethers.getContractFactory("Dice");
+  const dice = await Dice.deploy();
+
+  console.log("Dice address:", dice.address);
 }
 
 main()
