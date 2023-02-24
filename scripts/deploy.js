@@ -13,10 +13,10 @@ async function main() {
 
   // console.log("FundMe address:", fundMe.address);
 
-  const Dice = await ethers.getContractFactory("Dice");
-  const dice = await Dice.deploy();
+  const DiceGameLobby = await ethers.getContractFactory("DiceGameLobby");
+  const diceGameLobby = await DiceGameLobby.deploy();
 
-  console.log("Dice address:", dice.address);
+  console.log("DiceGameLobby address:", diceGameLobby.address);
 }
 
 main()
