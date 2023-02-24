@@ -74,14 +74,15 @@ contract DiceGame {
 contract DiceGameLobby {
     uint256 private gameCounter;
     DiceGame[] private games;
+    event CreateGame(address _gameAddress);
 
-    function createGame(uint betNumber) public payable returns (address) {
+    function createGame(uint betNumber) public payable {
         require(msg.value > 0, "Please send a bet amount.");
         DiceGame newGame = (new DiceGame)();
         newGame.createGame{value: msg.value}(betNumber);
         games.push(newGame);
         gameCounter++;
-        return newGame.getAddress();
+        emit CreateGame(newGame.getAddress());
     }
 
     function play(
