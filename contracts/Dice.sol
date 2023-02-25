@@ -23,6 +23,7 @@ contract DiceGame {
     function joinGame(uint betNumber) public payable {
         require(msg.value == betAmount, "Please send the correct bet amount.");
         require(player2 == address(0), "Game already has two players.");
+        require(player1 != msg.sender, "Cannot play with same account.");
         require(
             betNumber >= 1 && betNumber <= 6,
             "Please send correct number."
@@ -75,6 +76,7 @@ contract DiceGameLobby {
     uint256 private gameCounter;
     DiceGame[] private games;
     event CreateGame(address _gameAddress);
+    event PlayGame(uint _rollNumber);
 
     function createGame(uint betNumber) public payable {
         require(msg.value > 0, "Please send a bet amount.");
@@ -85,19 +87,16 @@ contract DiceGameLobby {
         emit CreateGame(newGame.getAddress());
     }
 
-    function play(
-        address gameAddress,
-        uint betNumber
-    ) public payable returns (uint) {
+    function play(address gameAddress, uint betNumber) public payable {
         require(msg.value > 0, "Please send a bet amount.");
         for (uint256 i = 0; i < games.length; i++) {
             DiceGame game = games[i];
             if (game.getAddress() == gameAddress) {
                 game.joinGame{value: msg.value}(betNumber);
-                return game.rollDice();
+                uint roll = game.rollDice();
+                emit PlayGame(roll);
             }
         }
-        return 0;
     }
 
     function getGameCount() public view returns (uint) {
