@@ -14,7 +14,7 @@ contract DiceGameLobby {
     uint256 gameIndexFeed;
     DiceGame[] private games;
 
-    event CreateGame(uint256 id);
+    event CreateGame(DiceGame game);
     event PlayGame(uint256 roll);
 
     function getGames() public view returns (DiceGame[] memory) {
@@ -32,7 +32,7 @@ contract DiceGameLobby {
             player2BetNumber: 0
         });
         games.push(newGame);
-        emit CreateGame(newGame.id);
+        emit CreateGame(newGame);
     }
 
     function play(uint256 id, uint256 betNumber) public payable {
