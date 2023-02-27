@@ -6,7 +6,7 @@
   "scripts": {
     "test": "hardhat test",
     "coverage": "hardhat coverage",
-    "deploy": "hardhat run scripts/deploy.js --network goerli"
+    "deploy": "hardhat test && hardhat run scripts/deploy.js --network goerli"
   },
   "repository": {
     "type": "git",
