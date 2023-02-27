@@ -38,7 +38,7 @@ contract DiceGameLobby {
     function play(uint256 id, uint256 betNumber) public payable {
         for (uint256 i = 0; i < games.length; i++) {
             if (games[i].id == id) {
-                DiceGame memory game = games[i];
+                DiceGame storage game = games[i];
                 require(
                     msg.value == game.betAmount,
                     "Please send the correct bet amount."
