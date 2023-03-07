@@ -14,7 +14,7 @@ interface IBankRoll {
 contract BankRoll is IBankRoll {
     // TODO owner
     function income() public payable {
-        console.log("BankRoll income: ", msg.value, ", from: ", msg.sender );
+        console.log("BankRoll income: ", msg.value);
         console.log("BankRoll current balance: ", address(this).balance);
     }
 
@@ -51,6 +51,7 @@ abstract contract CasinoGame {
         wager = customizeWager;
     }
 
+    // 玩家加入游戏
     function join(address gamblerAddress, uint256 bet) public payable {
         // require(wager > 0, 'INTERNAL_INIT');
         // require(wager == msg.value, 'WAGER_INVALID');
@@ -65,23 +66,35 @@ abstract contract CasinoGame {
     }
 
 
+    //  抽水，默认 10%
     function customizeVigorish() public view returns (uint256) {
-        require(wager > 0, 'INTERNAL_INIT');
-        return (wager * 5) / 100;
+        require(wager > 0, "INTERNAL_INIT");
+        return (wager * 10) / 100;
     }
 
-    function play() public returns (address, address) {
+    // 游戏结果以及支付彩头
+    function play(address _bankRoll) public {
         (address winner, address loser) = getWinnerAndLoser();
+
+        IBankRoll bankRoll = IBankRoll(_bankRoll);
+        uint256 refund = wager - customizeVigorish();
+        if(winner == loser) {
+            bankRoll.payout(payable(winner), refund);
+            bankRoll.payout(payable(loser), refund);
+        } else {
+            bankRoll.payout(payable(winner), refund);
+        }
         emit PlayGame_Event(winner);
-        return (winner, loser);
     }
 
 
+    // 需要具体 游戏SmartContract 实现的游戏输赢规则
     function getWinnerAndLoser() public virtual returns (address, address);
 }
 
-// ROCK: 0; PAPER: 1; SCISSORS: 2;
 contract RockPaperScissors is CasinoGame {
+    // 石头剪刀布游戏
+    // 选项: ROCK: 0; PAPER: 1; SCISSORS: 2;
     function init(uint256 customizeWager) public override {
         super.init(customizeWager);
         gameType = 'ROCK_PAPER_SCISSORS';
@@ -111,53 +124,58 @@ contract RockPaperScissors is CasinoGame {
 
 contract ACasino {
     IBankRoll private bankRoll;
-    mapping(address => CasinoGame) private gameMap;
+    mapping(address => CasinoGame) private activeGameMap;
     address[] private games;
 
     constructor() {
         bankRoll = new BankRoll();
     }
 
-    // function createGame(string memory inputGameType, uint256 bet) public payable {
-    function createGame() public payable {
+    // 游戏创建
+    // 用户创建游戏，等待另一个玩家加入
+    // @Params bet 用户的选项，如 ROCK-PAPER-SCISSORS 游戏中，选择的是 ROCK，PAPER，还是 SCISSORS，用数字表示
+    function createGame(uint256 bet) public payable {
+        // 先付钱
         bankRoll.income{value: msg.value}();
 
-        string memory inputGameType = "SCISSORS";
-        uint256 bet = 2;
-
+        // 创建游戏
         CasinoGame game;
         game = new RockPaperScissors();
         game.init(msg.value);
+        // 加入游戏
         game.join(msg.sender, bet);
 
         address gameAddress = address(game);
-        gameMap[gameAddress] = game;
+        activeGameMap[gameAddress] = game;
         games.push(gameAddress);
     }
 
-    // function playGame(address targetGame, uint256 bet) public payable {
-    function playGame() public payable {
-        uint256 bet = 1;
+    // 游戏开始
+    // @Params targetGame 用户想要加入的游戏的地址
+    // @Params bet 用户的选项，如 ROCK-PAPER-SCISSORS 游戏中，选择的是 ROCK，PAPER，还是 SCISSORS，用数字表示
+    function playGame(address targetGame, uint256 bet) public payable {
+        // 先付钱
         bankRoll.income{value: 100}();
 
-        CasinoGame game = gameMap[games[0]];
-        game.join(msg.sender, bet);
-        (address winner, address loser) = game.play();
+        // 找到游戏
+        CasinoGame game = activeGameMap[targetGame];
 
-        uint256 refund = game.customizeVigorish();
-        if(winner == loser) {
-            bankRoll.payout(payable(winner), refund);
-            bankRoll.payout(payable(loser), refund);
-        } else {
-            bankRoll.payout(payable(winner), refund);
-        }
-        // delete gameMap[address(game)];
+        // 加入游戏
+        game.join(msg.sender, bet);
+        // 游戏启动
+        game.play(address(bankRoll));
+
+        //　游戏结束，删除游戏
+        delete activeGameMap[address(game)];
     }
 
+    // 获取游戏列表
+    // 可以加入的游戏，则返回游戏数据；已经结束的游戏，返回 addres(0)
+    // @returns array< CasinoGame | address(0) >
     function getGames() public view returns (CasinoGame[] memory) {
         CasinoGame[] memory allGames = new CasinoGame[](games.length);
-        for(uint i = 0; i<games.length; i++) {
-            CasinoGame game = gameMap[games[i]];
+        for(uint i = 0; i < games.length; i++) {
+            CasinoGame game = activeGameMap[games[i]];
             allGames[i] = game;
         }    
         return allGames;
