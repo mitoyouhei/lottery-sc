@@ -11,6 +11,19 @@ interface IBankRoll {
     function showBalance() external view returns (uint256);
 }
 
+    struct Gambler {
+        address id;
+        uint256 bet;
+    }
+    // 这个 DisplayInfo 为了展示用，否则返回的是 address，
+    // 设计不太好，后面再想想
+    struct DisplayInfo {
+         address id;
+         uint256 wager;
+         string gameType;
+         Gambler[] gamblers;
+    }
+
 contract BankRoll is IBankRoll {
     // TODO owner
     function income() public payable {
@@ -35,10 +48,6 @@ contract BankRoll is IBankRoll {
 }
 
 abstract contract CasinoGame {
-    struct Gambler {
-        address id;
-        uint256 bet;
-    }
 
     string public gameType;
     uint256 public wager;
@@ -90,7 +99,9 @@ abstract contract CasinoGame {
 
     // 需要具体 游戏SmartContract 实现的游戏输赢规则
     function getWinnerAndLoser() public virtual returns (address, address);
+    function getDisplayInfo() public view virtual returns (DisplayInfo memory);
 }
+
 
 contract RockPaperScissors is CasinoGame {
     // 石头剪刀布游戏
@@ -120,9 +131,18 @@ contract RockPaperScissors is CasinoGame {
 
         return gamblerBIsWinner ? (gamblerB.id, gamblerA.id) : (gamblerA.id, gamblerB.id);
     }
+
+    function getDisplayInfo() public view override returns (DisplayInfo memory) {
+        return DisplayInfo({
+            id: address(this),
+            wager: wager,
+            gameType: gameType,
+            gamblers: gamblers
+        });
+    }
 }
 
-contract ACasino {
+contract Casino {
     IBankRoll private bankRoll;
     mapping(address => CasinoGame) private activeGameMap;
     address[] private games;
@@ -165,18 +185,18 @@ contract ACasino {
         // 游戏启动
         game.play(address(bankRoll));
 
-        //　游戏结束，删除游戏
-        delete activeGameMap[address(game)];
+        //　TODO
+        //  游戏结束，删除游戏
+        // delete activeGameMap[address(game)];
     }
 
     // 获取游戏列表
-    // 可以加入的游戏，则返回游戏数据；已经结束的游戏，返回 addres(0)
-    // @returns array< CasinoGame | address(0) >
-    function getGames() public view returns (CasinoGame[] memory) {
-        CasinoGame[] memory allGames = new CasinoGame[](games.length);
+    // @returns array< DisplayInfo >
+    function getGames() public view returns (DisplayInfo[] memory) {
+        DisplayInfo[] memory allGames = new DisplayInfo[](games.length);
         for(uint i = 0; i < games.length; i++) {
             CasinoGame game = activeGameMap[games[i]];
-            allGames[i] = game;
+            allGames[i] = game.getDisplayInfo();
         }    
         return allGames;
     }
