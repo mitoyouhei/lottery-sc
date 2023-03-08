@@ -26,6 +26,7 @@ interface IBankRoll {
 
 contract BankRoll is IBankRoll {
     // TODO owner
+
     function income() public payable {
         console.log("BankRoll income: ", msg.value);
         console.log("BankRoll current balance: ", address(this).balance);
@@ -155,6 +156,8 @@ contract Casino {
     // 用户创建游戏，等待另一个玩家加入
     // @Params bet 用户的选项，如 ROCK-PAPER-SCISSORS 游戏中，选择的是 ROCK，PAPER，还是 SCISSORS，用数字表示
     function createGame(uint256 bet) public payable {
+        require(msg.value > 0, "NEED_ETH");
+
         // 先付钱
         bankRoll.income{value: msg.value}();
 
@@ -174,8 +177,10 @@ contract Casino {
     // @Params targetGame 用户想要加入的游戏的地址
     // @Params bet 用户的选项，如 ROCK-PAPER-SCISSORS 游戏中，选择的是 ROCK，PAPER，还是 SCISSORS，用数字表示
     function playGame(address targetGame, uint256 bet) public payable {
+        require(msg.value > wager, "NEED_MORE");
+
         // 先付钱
-        bankRoll.income{value: 100}();
+        bankRoll.income{value: msg.value}();
 
         // 找到游戏
         CasinoGame game = activeGameMap[targetGame];
