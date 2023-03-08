@@ -4,25 +4,24 @@ import "hardhat/console.sol";
 
 interface IBankRoll {
     function income() external payable;
-
     function payout(address payable target, uint256 balance) external;
-
     function withdraw() external;
     function showBalance() external view returns (uint256);
 }
 
-    struct Gambler {
-        address id;
-        uint256 bet;
-    }
-    // 这个 DisplayInfo 为了展示用，否则返回的是 address，
-    // 设计不太好，后面再想想
-    struct DisplayInfo {
-         address id;
-         uint256 wager;
-         string gameType;
-         Gambler[] gamblers;
-    }
+struct Gambler {
+    address id;
+    uint256 bet;
+}
+
+// 这个 DisplayInfo 为了展示用，否则返回的是 address，
+// 设计不太好，后面再想想
+struct DisplayInfo {
+     address id;
+     uint256 wager;
+     string gameType;
+     Gambler[] gamblers;
+}
 
 contract BankRoll is IBankRoll {
     // TODO owner
