@@ -176,7 +176,7 @@ contract Casino {
     // @Params targetGame 用户想要加入的游戏的地址
     // @Params bet 用户的选项，如 ROCK-PAPER-SCISSORS 游戏中，选择的是 ROCK，PAPER，还是 SCISSORS，用数字表示
     function playGame(address targetGame, uint256 bet) public payable {
-        require(msg.value > wager, "NEED_MORE");
+        require(msg.value > 0, "NEED_MORE");
 
         // 先付钱
         bankRoll.income{value: msg.value}();
