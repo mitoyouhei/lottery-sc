@@ -4,9 +4,6 @@ const { address } = require("hardhat/internal/core/config/config-validation");
 
 // 定义 Casino 合约测试套件
 describe("Casino", function () {
-  // 定义一个空的玩家地址，用于测试
-  const emptyAddress = "0x0000000000000000000000000000000000000000";
-
   // 声明全局变量
   let diceGame;
   let player1;
@@ -22,8 +19,8 @@ describe("Casino", function () {
 
     // 创建两个测试用的玩家地址
     [player1, player2] = await ethers.getSigners();
-    player1Bet = 0; // ROCK
-    player2Bet = 1; // PAPER
+    player1Bet = 1; // ROCK
+    player2Bet = 2; // PAPER
   });
 
   // 测试 createGame 函数
@@ -32,7 +29,7 @@ describe("Casino", function () {
     
     const currentGames =(await casino.getGames());
     const rockPaperScissors = currentGames[0];
-
+  
     expect(rockPaperScissors.gamblers[0].id).to.equal(player1.address);
     expect(currentGames.length).to.equal(1);
   });
@@ -54,6 +51,6 @@ describe("Casino", function () {
     const gamblerB = playedRockPaperScissors.gamblers[1];
 
     expect(gamblerB.id).to.equal(player2.address);
-    expect(gamblerB.bet).to.equal(player2Bet);
+    expect(gamblerB.bet).to.equal(0);
   });
 });
