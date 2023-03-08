@@ -7,7 +7,7 @@ import "./Game.sol";
 
 contract Casino {
     IBankRoll private bankRoll;
-    mapping(address => CasinoGame) private activeGameMap;
+    mapping(address => Game) private activeGameMap;
     address[] private games;
 
     constructor() {
@@ -24,7 +24,7 @@ contract Casino {
         bankRoll.income{value: msg.value}();
 
         // 创建游戏
-        CasinoGame game;
+        Game game;
         game = new RockPaperScissors();
         game.init(msg.value);
         // 加入游戏
@@ -41,7 +41,7 @@ contract Casino {
     function playGame(address targetGame, uint256 bet) public payable {
         require(msg.value > 0, "NEED_WAGER");
         // 找到游戏
-        CasinoGame game = activeGameMap[targetGame];
+        Game game = activeGameMap[targetGame];
 
         // 先付钱
         require(msg.value >= game.getWager(), "NEED_MORE");
@@ -62,7 +62,7 @@ contract Casino {
     function getGames() public view returns (DisplayInfo[] memory) {
         DisplayInfo[] memory allGames = new DisplayInfo[](games.length);
         for (uint256 i = 0; i < games.length; i++) {
-            CasinoGame game = activeGameMap[games[i]];
+            Game game = activeGameMap[games[i]];
             allGames[i] = game.getDisplayInfo();
         }
         return allGames;

@@ -20,12 +20,12 @@ struct DisplayInfo {
     Gambler[] gamblers;
 }
 
-abstract contract CasinoGame {
+abstract contract Game {
     string public gameType;
     uint256 public wager;
     Gambler[] public gamblers;
 
-    event JoinGame_Event(CasinoGame game);
+    event JoinGame_Event(Game game);
     event PlayGame_Event(address winner);
 
     function init(uint256 customizeWager) public virtual {
@@ -75,7 +75,7 @@ abstract contract CasinoGame {
     function getDisplayInfo() public view virtual returns (DisplayInfo memory);
 }
 
-contract RockPaperScissors is CasinoGame {
+contract RockPaperScissors is Game {
     // 石头剪刀布游戏
     // 选项: ROCK: 1; PAPER: 2; SCISSORS: 3;
     function init(uint256 customizeWager) public override {
