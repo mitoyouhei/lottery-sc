@@ -8,9 +8,6 @@ import "./Game.sol";
 // TODO: chainlink VRF
 // TODO: gameType to enum
 
-uint256 constant DICE_GAME_ID = 1;
-uint256 constant ROCK_PAPER_SCISSORS_GAME_ID = 2;
-
 contract Casino {
     IBankRoll private bankRoll;
     mapping(address => Game) private activeGameMap;
@@ -24,9 +21,9 @@ contract Casino {
     // 用户创建游戏，等待另一个玩家加入
     // @Params gameType 用户选择的游戏
     // @Params bet 用户的选项，如 ROCK-PAPER-SCISSORS 游戏中，选择的是 ROCK，PAPER，还是 SCISSORS，用数字表示
-    function createGame(uint256 gameId, uint256 bet) public payable {
-        require(gameId >0, "VALID_GAME");
-        require(gameId < 3, "VALID_GAME");
+    function createGame(uint256 gameType, uint256 bet) public payable {
+        require(gameType >0, "VALID_GAME");
+        require(gameType < 3, "VALID_GAME");
         require(msg.value > 0, "NEED_ETH");
 
         // 先付钱
@@ -34,10 +31,10 @@ contract Casino {
 
         // 创建游戏
         Game game;
-        if(gameId == DICE_GAME_ID) {
+        if(gameType == DICE_GAME_TYPE) {
             game = new Dice();
         } 
-        if(gameId == ROCK_PAPER_SCISSORS_GAME_ID) {
+        if(gameType == ROCK_PAPER_SCISSORS_GAME_TYPE) {
             game = new RockPaperScissors();
         }
        

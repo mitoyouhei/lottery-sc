@@ -6,6 +6,9 @@ import "./BankRoll.sol";
 
 uint256 constant DEFAULT_BET = 0; // 保留值
 
+uint256 constant DICE_GAME_TYPE = 1; // 掷骰子
+uint256 constant ROCK_PAPER_SCISSORS_GAME_TYPE = 2; // 石头剪刀布
+
 struct Gambler {
     address id;
     uint256 bet;
@@ -16,12 +19,12 @@ struct Gambler {
 struct DisplayInfo {
     address id;
     uint256 wager;
-    string gameType;
+    uint256 gameType;
     Gambler[] gamblers;
 }
 
 abstract contract Game {
-    string public gameType;
+    uint256 public gameType;
     uint256 public wager;
     Gambler[] public gamblers;
 
@@ -44,7 +47,7 @@ abstract contract Game {
         emit JoinGame_Event(this);
     }
 
-    //  抽水，默认 10%
+    // 抽水，默认 10%
     function customizeVigorish() public view returns (uint256) {
         require(wager > 0, "INTERNAL_INIT");
         return (wager * 10) / 100;
@@ -80,7 +83,7 @@ contract RockPaperScissors is Game {
     // 选项: ROCK: 1; PAPER: 2; SCISSORS: 3;
     function init(uint256 customizeWager) public override {
         super.init(customizeWager);
-        gameType = "ROCK_PAPER_SCISSORS";
+        gameType = ROCK_PAPER_SCISSORS_GAME_TYPE;
     }
 
     function getWinnerAndLoser()
@@ -146,7 +149,7 @@ contract Dice is Game {
     // 选项: 点数, 1~6;
     function init(uint256 customizeWager) public override {
         super.init(customizeWager);
-        gameType = "DICE";
+        gameType = DICE_GAME_TYPE;
     }
 
     function getWinnerAndLoser()
