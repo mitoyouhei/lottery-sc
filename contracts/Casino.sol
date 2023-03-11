@@ -22,7 +22,7 @@ contract Casino {
     // @Params gameType 用户选择的游戏
     // @Params bet 用户的选项，如 ROCK-PAPER-SCISSORS 游戏中，选择的是 ROCK，PAPER，还是 SCISSORS，用数字表示
     function createGame(uint256 gameType, uint256 bet) public payable {
-        require(gameType >0, "VALID_GAME");
+        require(gameType > 0, "VALID_GAME");
         require(gameType < 3, "VALID_GAME");
         require(msg.value > 0, "NEED_ETH");
 
@@ -31,13 +31,13 @@ contract Casino {
 
         // 创建游戏
         Game game;
-        if(gameType == DICE_GAME_TYPE) {
+        if (gameType == DICE_GAME_TYPE) {
             game = new Dice();
-        } 
-        if(gameType == ROCK_PAPER_SCISSORS_GAME_TYPE) {
+        }
+        if (gameType == ROCK_PAPER_SCISSORS_GAME_TYPE) {
             game = new RockPaperScissors();
         }
-       
+
         game.init(msg.value);
         // 加入游戏
         game.join(msg.sender, bet);
@@ -78,5 +78,14 @@ contract Casino {
             allGames[i] = game.getDisplayInfo();
         }
         return allGames;
+    }
+
+    // 获取游戏列表
+    // @returns array< DisplayInfo >
+    function getGame(
+        address targetGame
+    ) public view returns (DisplayInfo memory) {
+        Game game = activeGameMap[targetGame];
+        return game.getDisplayInfo();
     }
 }
