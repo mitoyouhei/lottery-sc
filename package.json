@@ -6,7 +6,7 @@
   "scripts": {
     "test": "hardhat test",
     "coverage": "hardhat coverage",
-    "deploy": "hardhat test && hardhat run scripts/deploy.js --network ganache"
+    "deploy": "hardhat test && hardhat run scripts/deploy.js --network mumbai"
   },
   "repository": {
     "type": "git",

@@ -14,5 +14,9 @@ module.exports = {
       url: process.env.GOERLI_URL,
       accounts: [process.env.GOERLI_DEPLOY_ACCOUNT_PRIVATE_KEY],
     },
+    mumbai: {
+      url: process.env.MUMBAI_URL,
+      accounts: [process.env.MUMBAI_DEPLOY_ACCOUNT_PRIVATE_KEY],
+    },
   },
 };
