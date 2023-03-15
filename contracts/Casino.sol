@@ -80,7 +80,7 @@ contract Casino {
         return allGames;
     }
 
-    // 获取游戏列表
+    // 获取游戏
     // @returns array< DisplayInfo >
     function getGame(
         address targetGame
