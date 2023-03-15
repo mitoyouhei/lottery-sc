@@ -7,13 +7,14 @@ import "./Game.sol";
 
 // TODO: chainlink VRF
 // TODO: gameType to enum
+// TODO: withDraw
 
 contract Casino {
     IBankRoll private bankRoll;
     mapping(address => Game) private activeGameMap;
     address[] private games;
 
-    constructor() {
+    function init() public {
         bankRoll = new BankRoll();
     }
 
