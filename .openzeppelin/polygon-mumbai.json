@@ -1,0 +1,71 @@
+{
+  "manifestVersion": "3.2",
+  "admin": {
+    "address": "0xDD0bfAeB6A09227ffD73dc00D642357C65647236",
+    "txHash": "0xb72bf622c1d7399cdd0e6396d205dfeea55eb789bdf1bf7ef60d9ec92a12b751"
+  },
+  "proxies": [
+    {
+      "address": "0x7e9BA8A648B3850b87Be4e3956F9388950c3d86A",
+      "txHash": "0x1b1e80eec3485f1239ef6de19c368f9e1cab9034b26773538b0f007ecce11f2e",
+      "kind": "transparent"
+    }
+  ],
+  "impls": {
+    "3b697e6a0e42d5987355161ab09d064ca1c40501d8633deb07604af8e637a436": {
+      "address": "0x0F224dB5F0BA82bBd6f6DCCb874e6122985A5fda",
+      "txHash": "0x001d4aa3f4198753dac22675fec4f76d5bfee5a397eb6ea7f1f6aeca2f549389",
+      "layout": {
+        "solcVersion": "0.8.19",
+        "storage": [
+          {
+            "label": "bankRoll",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_contract(IBankRoll)373",
+            "contract": "Casino",
+            "src": "contracts/Casino.sol:13"
+          },
+          {
+            "label": "activeGameMap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_mapping(t_address,t_contract(Game)1179)",
+            "contract": "Casino",
+            "src": "contracts/Casino.sol:14"
+          },
+          {
+            "label": "games",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_array(t_address)dyn_storage",
+            "contract": "Casino",
+            "src": "contracts/Casino.sol:15"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_address)dyn_storage": {
+            "label": "address[]",
+            "numberOfBytes": "32"
+          },
+          "t_contract(Game)1179": {
+            "label": "contract Game",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IBankRoll)373": {
+            "label": "contract IBankRoll",
+            "numberOfBytes": "20"
+          },
+          "t_mapping(t_address,t_contract(Game)1179)": {
+            "label": "mapping(address => contract Game)",
+            "numberOfBytes": "32"
+          }
+        }
+      }
+    }
+  }
+}
