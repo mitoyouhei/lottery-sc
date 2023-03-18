@@ -7,7 +7,7 @@ NO_COLOR='\033[0m'
 # TODO: reinstall the source
 
 # target networks
-declare -a ARRAY_NAME_HERE=(mumbai goerli)
+declare -a ARRAY_NAME_HERE=(mumbai_test goerli_test)
 #declare -a ARRAY_NAME_HERE=(ganache)
 
 # deploy script in loop

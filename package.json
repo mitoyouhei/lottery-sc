@@ -6,7 +6,7 @@
   "scripts": {
     "test": "hardhat test",
     "coverage": "hardhat coverage",
-    "deploy": "hardhat run scripts/deploy.js --network mumbai",
+    "deploy": "hardhat run scripts/deploy.js --network mumbai_test",
     "deploy-local": "hardhat run scripts/deploy.js --network ganache",
     "deploy-all": "bin/deploy_to_all_chain.sh"
   },
