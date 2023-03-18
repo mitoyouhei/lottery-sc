@@ -102,6 +102,9 @@ dist
 # FuseBox cache
 .fusebox/
 
+# Local development
+.openzeppelin/unknown-1337.json
+
 # DynamoDB Local files
 .dynamodb/
 
