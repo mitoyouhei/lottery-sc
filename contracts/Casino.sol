@@ -7,7 +7,6 @@ import "./Game.sol";
 
 // TODO: chainlink VRF
 // TODO: gameType to enum
-// TODO: withDraw
 
 contract Casino {
     IBankRoll private bankRoll;
@@ -32,6 +31,7 @@ contract Casino {
         require(gameType > 0, "VALID_GAME");
         require(gameType < 3, "VALID_GAME");
         require(msg.value > 0, "NEED_ETH");
+        console.log('owner: ', owner);
 
         // 先付钱
         bankRoll.income{value: msg.value}();
@@ -71,18 +71,20 @@ contract Casino {
         // 游戏启动
         game.play(address(bankRoll));
 
-        //　TODO
         //  游戏结束，删除游戏
-        // delete activeGameMap[address(game)];
+        delete activeGameMap[targetGame];
     }
 
     // 获取游戏列表
-    // @returns array< DisplayInfo >
+    // @returns array< DisplayInfo >, 如果游戏已经结束，则 address 为 address(0)
     function getGames() public view returns (DisplayInfo[] memory) {
         DisplayInfo[] memory allGames = new DisplayInfo[](games.length);
         for (uint256 i = 0; i < games.length; i++) {
             Game game = activeGameMap[games[i]];
-            allGames[i] = game.getDisplayInfo();
+            // 游戏状态为 active，则返回游戏数据
+            if(address(game) != address(0)) {
+                allGames[i] = game.getDisplayInfo();
+            }
         }
         return allGames;
     }
@@ -93,6 +95,11 @@ contract Casino {
         address targetGame
     ) public view returns (DisplayInfo memory) {
         Game game = activeGameMap[targetGame];
-        return game.getDisplayInfo();
+        if(address(game) != address(0)) {
+            return game.getDisplayInfo();
+        } else {
+            DisplayInfo memory emptyInfo;
+            return emptyInfo;
+        }
     }
 }
