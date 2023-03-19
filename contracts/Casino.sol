@@ -21,10 +21,6 @@ contract Casino {
         bankRoll.init(msg.sender);
     }
     
-    function withdraw() public {
-        bankRoll.withdraw(msg.sender, msg.sender);
-    }
-
     // 游戏创建
     // 用户创建游戏，等待另一个玩家加入
     // @Params gameType 用户选择的游戏

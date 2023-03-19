@@ -9,13 +9,18 @@ interface IBankRoll {
 
     function payout(address payable target, uint256 balance) external;
 
-    function withdraw(address _cmdSender, address _sendTo) external;
+    function withdraw(address _sendTo) external;
 
     function showBalance() external view returns (uint256);
 }
 
 contract BankRoll is IBankRoll {
     address private owner;
+    
+    modifier _onlyOwner(){
+        require(msg.sender == owner, "DENIED_BY_NOT_OWNER");
+        _;
+    }
     
     function init(address _owner) public {
         owner = _owner;
@@ -33,8 +38,7 @@ contract BankRoll is IBankRoll {
         require(success, "PAYOUT_FAILED");
     }
 
-    function withdraw(address _owner, address _sendTo) public {
-        require(_owner == owner, "DENIED_BY_NOT_OWNER");
+    function withdraw(address _sendTo) _onlyOwner public {
         payable(_sendTo).transfer(address(this).balance);
         console.log("BankRoll current balance: ", address(this).balance);
     }
