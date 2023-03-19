@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity >=0.8.18 <0.9.0;
 import "hardhat/console.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 import "./BankRoll.sol";
 import "./Game.sol";
 
-contract RockPaperScissors is Game {
+contract RockPaperScissors is Game, ReentrancyGuard {
     // 石头剪刀布游戏
     // 选项: ROCK: 1; PAPER: 2; SCISSORS: 3;
     function init(uint256 customizeWager) public override {
@@ -15,7 +16,7 @@ contract RockPaperScissors is Game {
 
     function getWinnerAndLoser()
         public
-        view
+        nonReentrant
         override
         returns (address, address)
     {

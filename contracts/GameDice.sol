@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity >=0.8.18 <0.9.0;
 import "hardhat/console.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 import "./BankRoll.sol";
 import "./Game.sol";
 
-contract Dice is Game {
+contract Dice is Game, ReentrancyGuard {
     // 掷骰子游戏
     // 选项: 点数, 1~6;
     function init(uint256 customizeWager) public override {
@@ -15,7 +16,7 @@ contract Dice is Game {
 
     function getWinnerAndLoser()
         public
-        view
+        nonReentrant
         override
         returns (address, address)
     {
