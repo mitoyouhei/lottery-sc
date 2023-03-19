@@ -13,7 +13,9 @@ import "./GameRockPaperScissors.sol";
 contract Casino {
     IBankRoll private bankRoll;
     mapping(address => Game) private activeGameMap;
+    mapping(address => Game) private finishedGameMap;
     address[] private games;
+    address[] private finishedGames;
     address private owner;
     function init() public {
         owner = msg.sender;
@@ -70,6 +72,8 @@ contract Casino {
         game.play(address(bankRoll));
 
         //  游戏结束，删除游戏
+        finishedGameMap[targetGame] = game;
+        finishedGames.push(targetGame);
         delete activeGameMap[targetGame];
     }
 
@@ -78,13 +82,30 @@ contract Casino {
     function getGames() public view returns (DisplayInfo[] memory) {
         DisplayInfo[] memory allGames = new DisplayInfo[](games.length);
         for (uint256 i = 0; i < games.length; i++) {
-            Game game = activeGameMap[games[i]];
-            // 游戏状态为 active，则返回游戏数据
-            if(address(game) != address(0)) {
-                allGames[i] = game.getDisplayInfo();
+            Game activeGame = activeGameMap[games[i]];
+            Game finishedGame = finishedGame[games[i]];
+            
+            if(address(game) == address(0)) {
+                allGames[i] = finishedGame.getDisplayInfo();
+            } else {
+                allGames[i] = activeGameMap.getDisplayInfo();
             }
         }
         return allGames;
+    }
+    
+    // 获取游戏列表
+    // @returns array< DisplayInfo >
+    function getActiveGames() public view returns (DisplayInfo[] memory) {
+        DisplayInfo[] memory activeGames = new DisplayInfo[](games.length - finishedGames.length);
+        for (uint256 i = 0; i < games.length; i++) {
+            Game game = activeGameMap[games[i]];
+            // 游戏状态为 active，则返回游戏数据
+            if(address(game) != address(0)) {
+                activeGames[i] = game.getDisplayInfo();
+            }
+        }
+        return activeGames;
     }
 
     // 获取游戏
@@ -92,12 +113,13 @@ contract Casino {
     function getGame(
         address targetGame
     ) public view returns (DisplayInfo memory) {
-        Game game = activeGameMap[targetGame];
-        if(address(game) != address(0)) {
-            return game.getDisplayInfo();
+        Game activeGame = activeGameMap[targetGame];
+        Game finishedGame = finishedGame[targetGame];
+        
+        if(address(game) == address(0)) {
+            return finishedGame.getDisplayInfo();
         } else {
-            DisplayInfo memory emptyInfo;
-            return emptyInfo;
+            return activeGame.getDisplayInfo();
         }
     }
 }
