@@ -61,6 +61,10 @@ contract Casino {
         require(msg.value > 0, "NEED_WAGER");
         // 找到游戏
         Game game = activeGameMap[targetGame];
+        // 游戏非 active 状态，revert
+        if(address(game) == address(0)) {
+            revert("GAME_FINISHED");
+        }
 
         // 先付钱
         require(msg.value >= game.getWager(), "NEED_MORE");
