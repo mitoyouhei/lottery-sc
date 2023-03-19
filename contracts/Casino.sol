@@ -13,9 +13,15 @@ contract Casino {
     IBankRoll private bankRoll;
     mapping(address => Game) private activeGameMap;
     address[] private games;
-
+    address private owner;
     function init() public {
+        owner = msg.sender;
         bankRoll = new BankRoll();
+        bankRoll.init(msg.sender);
+    }
+    
+    function withdraw() public {
+        bankRoll.withdraw(msg.sender, msg.sender);
     }
 
     // 游戏创建
