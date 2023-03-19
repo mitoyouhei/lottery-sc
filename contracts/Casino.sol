@@ -87,12 +87,12 @@ contract Casino {
         DisplayInfo[] memory allGames = new DisplayInfo[](games.length);
         for (uint256 i = 0; i < games.length; i++) {
             Game activeGame = activeGameMap[games[i]];
-            Game finishedGame = finishedGame[games[i]];
+            Game finishedGame = finishedGameMap[games[i]];
             
-            if(address(game) == address(0)) {
+            if(address(activeGame) == address(0)) {
                 allGames[i] = finishedGame.getDisplayInfo();
             } else {
-                allGames[i] = activeGameMap.getDisplayInfo();
+                allGames[i] = activeGame.getDisplayInfo();
             }
         }
         return allGames;
@@ -118,9 +118,9 @@ contract Casino {
         address targetGame
     ) public view returns (DisplayInfo memory) {
         Game activeGame = activeGameMap[targetGame];
-        Game finishedGame = finishedGame[targetGame];
+        Game finishedGame = finishedGameMap[targetGame];
         
-        if(address(game) == address(0)) {
+        if(address(activeGame) == address(0)) {
             return finishedGame.getDisplayInfo();
         } else {
             return activeGame.getDisplayInfo();
