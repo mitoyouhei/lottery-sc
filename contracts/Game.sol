@@ -4,14 +4,14 @@ import "hardhat/console.sol";
 
 import "./BankRoll.sol";
 
-uint256 constant DEFAULT_BET = 0; // 保留值
+uint256 constant DEFAULT_CHOICE = 0; // 保留值
 
 uint256 constant DICE_GAME_TYPE = 1; // 掷骰子
 uint256 constant ROCK_PAPER_SCISSORS_GAME_TYPE = 2; // 石头剪刀布
 
 struct Gambler {
     address id;
-    uint256 bet;
+    uint256 choice;
 }
 
 // 这个 DisplayInfo 为了展示用，否则返回的是 address，
@@ -36,12 +36,12 @@ abstract contract Game {
     }
 
     // 玩家加入游戏
-    function join(address gamblerAddress, uint256 bet) public payable {
+    function join(address gamblerAddress, uint256 choice) public payable {
         // require(wager > 0, 'INTERNAL_INIT');
         // require(wager == msg.value, 'WAGER_INVALID');
 
-        console.log("join bet: ", bet);
-        Gambler memory gambler = Gambler({id: gamblerAddress, bet: bet});
+        console.log("join choice: ", choice);
+        Gambler memory gambler = Gambler({id: gamblerAddress, choice: choice});
 
         gamblers.push(gambler);
         emit JoinGame_Event(this);

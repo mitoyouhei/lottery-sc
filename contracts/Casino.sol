@@ -28,8 +28,8 @@ contract Casino {
     // 游戏创建
     // 用户创建游戏，等待另一个玩家加入
     // @Params gameType 用户选择的游戏
-    // @Params bet 用户的选项，如 ROCK-PAPER-SCISSORS 游戏中，选择的是 ROCK，PAPER，还是 SCISSORS，用数字表示
-    function createGame(uint256 gameType, uint256 bet) public payable {
+    // @Params choice 用户的选项，如 ROCK-PAPER-SCISSORS 游戏中，选择的是 ROCK，PAPER，还是 SCISSORS，用数字表示
+    function createGame(uint256 gameType, uint256 choice) public payable {
         require(gameType > 0, "VALID_GAME");
         require(gameType < 3, "VALID_GAME");
         require(msg.value > 0, "NEED_ETH");
@@ -49,7 +49,7 @@ contract Casino {
 
         game.init(msg.value);
         // 加入游戏
-        game.join(msg.sender, bet);
+        game.join(msg.sender, choice);
 
         address gameAddress = address(game);
         activeGameMap[gameAddress] = game;
@@ -58,8 +58,8 @@ contract Casino {
 
     // 游戏开始
     // @Params targetGame 用户想要加入的游戏的地址
-    // @Params bet 用户的选项，如 ROCK-PAPER-SCISSORS 游戏中，选择的是 ROCK，PAPER，还是 SCISSORS，用数字表示
-    function playGame(address targetGame, uint256 bet) public payable {
+    // @Params choice 用户的选项，如 ROCK-PAPER-SCISSORS 游戏中，选择的是 ROCK，PAPER，还是 SCISSORS，用数字表示
+    function playGame(address targetGame, uint256 choice) public payable {
         require(msg.value > 0, "NEED_WAGER");
         // 找到游戏
         Game game = activeGameMap[targetGame];
@@ -69,7 +69,7 @@ contract Casino {
         bankRoll.income{value: msg.value}();
 
         // 加入游戏
-        game.join(msg.sender, bet);
+        game.join(msg.sender, choice);
         // 游戏启动
         game.play(address(bankRoll));
 

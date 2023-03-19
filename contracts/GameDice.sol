@@ -5,11 +5,6 @@ import "hardhat/console.sol";
 import "./BankRoll.sol";
 import "./Game.sol";
 
-uint256 constant DEFAULT_BET = 0; // 保留值
-
-uint256 constant DICE_GAME_TYPE = 1; // 掷骰子
-uint256 constant ROCK_PAPER_SCISSORS_GAME_TYPE = 2; // 石头剪刀布
-
 contract Dice is Game {
     // 掷骰子游戏
     // 选项: 点数, 1~6;
@@ -35,7 +30,7 @@ contract Dice is Game {
         ) % 6) + 1;
 
         bool winnerIsBig = roll >= 4;
-        bool gamblerBIsBig = gamblerB.bet >= 4;
+        bool gamblerBIsBig = gamblerB.choice >= 4;
         bool gamblerBIsWinner = (winnerIsBig && gamblerBIsBig) ||
             (!winnerIsBig && !gamblerBIsBig);
 

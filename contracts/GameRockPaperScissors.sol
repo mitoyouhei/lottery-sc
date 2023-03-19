@@ -5,11 +5,6 @@ import "hardhat/console.sol";
 import "./BankRoll.sol";
 import "./Game.sol";
 
-uint256 constant DEFAULT_BET = 0; // 保留值
-
-uint256 constant DICE_GAME_TYPE = 1; // 掷骰子
-uint256 constant ROCK_PAPER_SCISSORS_GAME_TYPE = 2; // 石头剪刀布
-
 contract RockPaperScissors is Game {
     // 石头剪刀布游戏
     // 选项: ROCK: 1; PAPER: 2; SCISSORS: 3;
@@ -28,17 +23,17 @@ contract RockPaperScissors is Game {
         Gambler memory gamblerA = gamblers[0];
         Gambler memory gamblerB = gamblers[1];
 
-        if (gamblerA.bet == gamblerB.bet) {
+        if (gamblerA.choice == gamblerB.choice) {
             return (address(0), address(0));
         }
 
         bool gamblerBIsWinner = false;
-        if (gamblerA.bet == 1) {
-            gamblerBIsWinner = gamblerB.bet == 2;
-        } else if (gamblerA.bet == 2) {
-            gamblerBIsWinner = gamblerB.bet == 3;
-        } else if (gamblerA.bet == 3) {
-            gamblerBIsWinner = gamblerB.bet == 1;
+        if (gamblerA.choice == 1) {
+            gamblerBIsWinner = gamblerB.choice == 2;
+        } else if (gamblerA.choice == 2) {
+            gamblerBIsWinner = gamblerB.choice == 3;
+        } else if (gamblerA.choice == 3) {
+            gamblerBIsWinner = gamblerB.choice == 1;
         }
 
         return
@@ -62,7 +57,7 @@ contract RockPaperScissors is Game {
             } else {
                 displayGamblers[i] = Gambler({
                     id: gamblers[i].id,
-                    bet: DEFAULT_BET
+                    choice: DEFAULT_CHOICE
                 });
             }
         }
