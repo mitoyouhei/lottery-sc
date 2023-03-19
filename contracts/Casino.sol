@@ -4,6 +4,8 @@ import "hardhat/console.sol";
 
 import "./BankRoll.sol";
 import "./Game.sol";
+import "./GameDice.sol";
+import "./GameRockPaperScissors.sol";
 
 // TODO: chainlink VRF
 // TODO: gameType to enum
