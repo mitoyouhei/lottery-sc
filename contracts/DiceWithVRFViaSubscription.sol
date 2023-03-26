@@ -13,20 +13,19 @@ uint64 constant SUBSCRIPTION_ID = 10593;
 address constant LINK_TOKEN = 0x326C977E6efc84E512bB9C30f76E30c160eD06FB; // GOERLI TEST
 bytes32 constant KEY_HASH = 0x79d3d8832d904592c0bf9818b621522c988bb8b0c05cdc3b15aea1b6e8db0c15; // we alread set this
 
-contract DiceWithVRF is VRFConsumerBaseV2, ConfirmedOwner {
+contract DiceWithVRFViaSubscription is VRFConsumerBaseV2, ConfirmedOwner {
     event RequestSent(uint256 requestId, uint32 numWords);
     event RequestFulfilled(uint256 requestId, uint256[] randomWords);
+    
     struct RequestStatus {
-        bool fulfilled; // whether the request has been successfully fulfilled
-        bool exists; // whether a requestId exists
+        bool fulfilled;
+        bool exists;
         uint256[] randomWords;
     }
     mapping(uint256 => RequestStatus)
-    public s_requests; /* requestId --> requestStatus */
+    public s_requests;
     VRFCoordinatorV2Interface COORDINATOR;
-    // past requests Id.
     uint256[] public requestIds;
-    // address public immutable linkToken;
     uint public randomWordsNum;
     
     constructor()
@@ -50,9 +49,9 @@ contract DiceWithVRF is VRFConsumerBaseV2, ConfirmedOwner {
         console.log("requestRandomWords requestId: ", requestId);
 
         s_requests[requestId] = RequestStatus({
-        randomWords: new uint256[](0),
-        exists: true,
-        fulfilled: false
+            randomWords: new uint256[](0),
+            exists: true,
+            fulfilled: false
         });
         requestIds.push(requestId);
         emit RequestSent(requestId, NUM_WORDS);
