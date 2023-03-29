@@ -17,12 +17,16 @@ contract Casino {
     address[] private games;
     address[] private finishedGames;
     address private owner;
+
     function init() public {
         owner = msg.sender;
         bankRoll = new BankRoll();
         bankRoll.init(msg.sender);
     }
-    
+
+    event CreateGame_Event(DisplayInfo game);
+    event CompleteGame_Event(address winner);
+
     // 游戏创建
     // 用户创建游戏，等待另一个玩家加入
     // @Params gameType 用户选择的游戏
@@ -31,7 +35,7 @@ contract Casino {
         require(gameType > 0, "VALID_GAME");
         require(gameType < 3, "VALID_GAME");
         require(msg.value > 0, "NEED_ETH");
-        console.log('owner: ', owner);
+        console.log("owner: ", owner);
 
         // 先付钱
         bankRoll.income{value: msg.value}();
@@ -52,6 +56,8 @@ contract Casino {
         address gameAddress = address(game);
         activeGameMap[gameAddress] = game;
         games.push(gameAddress);
+
+        emit CreateGame_Event(game.getDisplayInfo());
     }
 
     // 游戏开始
@@ -62,7 +68,7 @@ contract Casino {
         // 找到游戏
         Game game = activeGameMap[targetGame];
         // 游戏非 active 状态，revert
-        if(address(game) == address(0)) {
+        if (address(game) == address(0)) {
             revert("GAME_FINISHED");
         }
 
@@ -73,12 +79,14 @@ contract Casino {
         // 加入游戏
         game.join(msg.sender, choice);
         // 游戏启动
-        game.play(address(bankRoll));
+        address winner = game.play(address(bankRoll));
 
         //  游戏结束，删除游戏
         finishedGameMap[targetGame] = game;
         finishedGames.push(targetGame);
         delete activeGameMap[targetGame];
+
+        emit CompleteGame_Event(winner);
     }
 
     // 获取游戏列表
@@ -88,8 +96,8 @@ contract Casino {
         for (uint256 i = 0; i < games.length; i++) {
             Game activeGame = activeGameMap[games[i]];
             Game finishedGame = finishedGameMap[games[i]];
-            
-            if(address(activeGame) == address(0)) {
+
+            if (address(activeGame) == address(0)) {
                 allGames[i] = finishedGame.getDisplayInfo();
             } else {
                 allGames[i] = activeGame.getDisplayInfo();
@@ -97,15 +105,17 @@ contract Casino {
         }
         return allGames;
     }
-    
+
     // 获取游戏列表
     // @returns array< DisplayInfo >
     function getActiveGames() public view returns (DisplayInfo[] memory) {
-        DisplayInfo[] memory activeGames = new DisplayInfo[](games.length - finishedGames.length);
+        DisplayInfo[] memory activeGames = new DisplayInfo[](
+            games.length - finishedGames.length
+        );
         for (uint256 i = 0; i < games.length; i++) {
             Game game = activeGameMap[games[i]];
             // 游戏状态为 active，则返回游戏数据
-            if(address(game) != address(0)) {
+            if (address(game) != address(0)) {
                 activeGames[i] = game.getDisplayInfo();
             }
         }
@@ -119,8 +129,8 @@ contract Casino {
     ) public view returns (DisplayInfo memory) {
         Game activeGame = activeGameMap[targetGame];
         Game finishedGame = finishedGameMap[targetGame];
-        
-        if(address(activeGame) == address(0)) {
+
+        if (address(activeGame) == address(0)) {
             return finishedGame.getDisplayInfo();
         } else {
             return activeGame.getDisplayInfo();

@@ -28,7 +28,7 @@ abstract contract Game {
     uint256 public wager;
     Gambler[] public gamblers;
 
-    event JoinGame_Event(Game game);
+    event JoinGame_Event(DisplayInfo game);
     event PlayGame_Event(address winner);
 
     function init(uint256 customizeWager) public virtual {
@@ -44,7 +44,7 @@ abstract contract Game {
         Gambler memory gambler = Gambler({id: gamblerAddress, choice: choice});
 
         gamblers.push(gambler);
-        emit JoinGame_Event(this);
+        emit JoinGame_Event(this.getDisplayInfo());
     }
 
     // 抽水，默认 10%
@@ -54,7 +54,7 @@ abstract contract Game {
     }
 
     // 游戏结果以及支付彩头
-    function play(address _bankRoll) public {
+    function play(address _bankRoll) public returns (address) {
         (address winner, address loser) = getWinnerAndLoser();
 
         IBankRoll bankRoll = IBankRoll(_bankRoll);
@@ -67,6 +67,8 @@ abstract contract Game {
             bankRoll.payout(payable(winner), refund * gamblers.length);
         }
         emit PlayGame_Event(winner);
+
+        return winner;
     }
 
     function getWager() public view returns (uint256) {
