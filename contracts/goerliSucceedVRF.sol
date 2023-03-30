@@ -9,7 +9,7 @@ import "@chainlink/contracts/src/v0.8/ConfirmedOwner.sol";
 uint32 constant CALLBACK_GAS_LIMIT = 150000;
 uint32 constant NUM_WORDS = 1;
 uint16 constant REQUEST_CONFIRMATIONS = 3;
-uint64 constant SUBSCRIPTION_ID = 10593;
+uint64 constant SUBSCRIPTION_ID = 10593;// g - 10593; mumbai - 3873;
 address constant LINK_TOKEN = 0x326C977E6efc84E512bB9C30f76E30c160eD06FB; // MUMBAI/GOERLI TEST
 bytes32 constant KEY_HASH = 0x79d3d8832d904592c0bf9818b621522c988bb8b0c05cdc3b15aea1b6e8db0c15; // Goerli 150 gwei
 bytes32 constant MUMBAI_KEY_HASH = 0x4b09e658ed251bcafeebbc69400383d49f344ace09b9576fe248bb02c003fe9f; // Mumbai 500 gwei
@@ -38,9 +38,9 @@ contract DiceWithVRFViaSubscription is VRFConsumerBaseV2, ConfirmedOwner {
     
     function requestRandomWords() public onlyOwner returns (uint256 requestId) {
         console.log("requestRandomWords");
-
+        
         requestId = COORDINATOR.requestRandomWords(
-            MUMBAI_KEY_HASH,
+            KEY_HASH,
             SUBSCRIPTION_ID,
             REQUEST_CONFIRMATIONS,
             CALLBACK_GAS_LIMIT,
@@ -48,11 +48,11 @@ contract DiceWithVRFViaSubscription is VRFConsumerBaseV2, ConfirmedOwner {
         );
         console.log("requestRandomWords");
         console.log("requestRandomWords requestId: ", requestId);
-
+        
         s_requests[requestId] = RequestStatus({
-            randomWords: new uint256[](0),
-            exists: true,
-            fulfilled: false
+        randomWords: new uint256[](0),
+        exists: true,
+        fulfilled: false
         });
         requestIds.push(requestId);
         emit RequestSent(requestId, NUM_WORDS);
@@ -75,6 +75,7 @@ contract DiceWithVRFViaSubscription is VRFConsumerBaseV2, ConfirmedOwner {
     ) external view returns (bool fulfilled, uint256[] memory randomWords) {
         require(s_requests[_requestId].exists, "request not found");
         RequestStatus memory request = s_requests[_requestId];
+        // randomWrods sample: 77178373320698631425604965672554619207557034891042727299091324268259953010551
         return (request.fulfilled, request.randomWords);
     }
     
