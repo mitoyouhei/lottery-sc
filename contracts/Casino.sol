@@ -17,8 +17,8 @@ contract Casino {
     address[] private games;
     address[] private finishedGames;
     address private owner;
-
-    function init() public {
+    
+    constructor() {
         owner = msg.sender;
         bankRoll = new BankRoll();
         bankRoll.init(msg.sender);
