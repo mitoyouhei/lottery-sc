@@ -1,5 +1,5 @@
 const { ethers, network, upgrades } = require("hardhat");
-const { getAddress } = require("./addressManage");
+const { getAddress } = require("../addressManage");
 
 async function main() {
   const [deployer] = await ethers.getSigners();
@@ -17,6 +17,8 @@ async function main() {
   const Casino = await ethers.getContractFactory("Casino");
   let casino;
 
+  console.log('originalAddress', originalAddress);
+
   if(originalAddress) {
     // 后续部署
     console.log('Not first time deploy');
@@ -27,10 +29,10 @@ async function main() {
     casino = await upgrades.deployProxy(Casino,{ initializer: 'init' });
   }
 
-  console.log('OriginalAddress: ', originalAddress);
   console.log("ImplementationAddress: ", await upgrades.erc1967.getImplementationAddress(casino.address));
   console.log("AdminAddress: ", await upgrades.erc1967.getAdminAddress(casino.address));
   console.log("Casino address: ", casino.address);
+  console.log("Contracts deployed");
 }
 
 main()
