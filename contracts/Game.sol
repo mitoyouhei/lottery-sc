@@ -8,6 +8,7 @@ uint256 constant DEFAULT_CHOICE = 0; // 保留值
 
 uint256 constant DICE_GAME_TYPE = 1; // 掷骰子
 uint256 constant ROCK_PAPER_SCISSORS_GAME_TYPE = 2; // 石头剪刀布
+uint256 constant DICE_WITH_VRF_GAME_TYPE = 3; // 石头剪刀布
 
 struct Gambler {
     address id;
@@ -79,4 +80,6 @@ abstract contract Game {
     function getWinnerAndLoser() public virtual returns (address, address);
 
     function getDisplayInfo() public view virtual returns (DisplayInfo memory);
+    
+    function playWithVRF() public virtual;
 }

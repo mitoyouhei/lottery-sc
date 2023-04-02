@@ -70,5 +70,9 @@ contract RockPaperScissors is Game, ReentrancyGuard {
                 gamblers: displayGamblers
             });
     }
+    
+    function playWithVRF() public view override {
+        require(gamblers.length == 2, "NEED_TWO_PLAYER");
+    }
 }
 

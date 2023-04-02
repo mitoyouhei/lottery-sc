@@ -31,6 +31,7 @@ contract BankRoll is IBankRoll {
         console.log("BankRoll current balance: ", address(this).balance);
     }
 
+    // 这个方法有漏洞
     function payout(address payable _sendTo, uint256 balance) public {
         (bool success, ) = _sendTo.call{value: balance}("");
         console.log("BankRoll payout: ", balance, ", to: ", _sendTo);

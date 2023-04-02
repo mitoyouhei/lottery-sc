@@ -55,4 +55,8 @@ contract Dice is Game, ReentrancyGuard {
                 gamblers: gamblers
             });
     }
+    
+    function playWithVRF() public view override {
+        require(gamblers.length == 2, "NEED_TWO_PLAYER");
+    }
 }
