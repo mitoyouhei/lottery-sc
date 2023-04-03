@@ -1,7 +1,6 @@
 // All the config in this file is from the url listed blow:
 // https://docs.chain.link/vrf/v2/subscription/supported-networks
-
-export const networkVrfConfigMap = {
+const networkVrfConfigMap = {
   "mumbai": {
     keyHash: "0x4b09e658ed251bcafeebbc69400383d49f344ace09b9576fe248bb02c003fe9f", // 500 gwei
     subId: 3873,
@@ -26,4 +25,8 @@ export const networkVrfConfigMap = {
     numWords: 1,
     VRFCoordinatorV2InterfaceAddress: "0xAE975071Be8F8eE67addBC1A82488F1C24858067"
   },
+}
+
+module.exports = {
+  networkVrfConfigMap
 }
