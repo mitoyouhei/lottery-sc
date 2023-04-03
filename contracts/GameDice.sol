@@ -16,19 +16,21 @@ contract Dice is Game, ReentrancyGuard {
 
     function getWinnerAndLoser()
         public
-        nonReentrant
         override
+        nonReentrant
         returns (address, address)
     {
+        revert("Shouldn't call!");
+    }
+
+    function getWinnerAndLoser(
+        uint256[] memory _randomWords
+    ) public override nonReentrant returns (address, address) {
         require(gamblers.length == 2, "NEED_TWO_PLAYER");
         Gambler memory gamblerA = gamblers[0];
         Gambler memory gamblerB = gamblers[1];
 
-        uint256 roll = (uint256(
-            keccak256(
-                abi.encodePacked(block.timestamp, block.prevrandao, msg.sender)
-            )
-        ) % 6) + 1;
+        uint256 roll = (_randomWords[0] % 6) + 1;
 
         bool winnerIsBig = roll >= 4;
         bool gamblerBIsBig = gamblerB.choice >= 4;
@@ -55,8 +57,8 @@ contract Dice is Game, ReentrancyGuard {
                 gamblers: gamblers
             });
     }
-    
-    function playWithVRF() public view override {
-        require(gamblers.length == 2, "NEED_TWO_PLAYER");
-    }
+
+    // function playWithVRF() public view override {
+    //     require(gamblers.length == 2, "NEED_TWO_PLAYER");
+    // }
 }

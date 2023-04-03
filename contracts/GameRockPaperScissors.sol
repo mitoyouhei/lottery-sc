@@ -14,10 +14,17 @@ contract RockPaperScissors is Game, ReentrancyGuard {
         gameType = ROCK_PAPER_SCISSORS_GAME_TYPE;
     }
 
+    function getWinnerAndLoser(
+        uint256[] memory _randomWords
+    ) public override nonReentrant returns (address, address) {
+        revert("Shouldn't call!");
+        require(_randomWords.length > 0, "Invalid number of words");
+    }
+
     function getWinnerAndLoser()
         public
-        nonReentrant
         override
+        nonReentrant
         returns (address, address)
     {
         require(gamblers.length == 2, "NEED_TWO_PLAYER");
@@ -70,9 +77,8 @@ contract RockPaperScissors is Game, ReentrancyGuard {
                 gamblers: displayGamblers
             });
     }
-    
-    function playWithVRF() public view override {
-        require(gamblers.length == 2, "NEED_TWO_PLAYER");
-    }
-}
 
+    // function playWithVRF() public view override {
+    //     require(gamblers.length == 2, "NEED_TWO_PLAYER");
+    // }
+}

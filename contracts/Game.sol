@@ -8,7 +8,6 @@ uint256 constant DEFAULT_CHOICE = 0; // 保留值
 
 uint256 constant DICE_GAME_TYPE = 1; // 掷骰子
 uint256 constant ROCK_PAPER_SCISSORS_GAME_TYPE = 2; // 石头剪刀布
-uint256 constant DICE_WITH_VRF_GAME_TYPE = 3; // 石头剪刀布
 
 struct Gambler {
     address id;
@@ -54,10 +53,11 @@ abstract contract Game {
         return (wager * 10) / 100;
     }
 
-    // 游戏结果以及支付彩头
-    function play(address _bankRoll) public returns (address) {
-        (address winner, address loser) = getWinnerAndLoser();
-
+    function _play(
+        address _bankRoll,
+        address winner,
+        address loser
+    ) internal returns (address) {
         IBankRoll bankRoll = IBankRoll(_bankRoll);
         uint256 refund = wager - customizeVigorish();
         if (winner == loser) {
@@ -72,6 +72,20 @@ abstract contract Game {
         return winner;
     }
 
+    // 游戏结果以及支付彩头
+    function play(address _bankRoll) public returns (address) {
+        (address winner, address loser) = getWinnerAndLoser();
+        return _play(_bankRoll, winner, loser);
+    }
+
+    function play(
+        address _bankRoll,
+        uint256[] memory _randomWords
+    ) public returns (address) {
+        (address winner, address loser) = getWinnerAndLoser(_randomWords);
+        return _play(_bankRoll, winner, loser);
+    }
+
     function getWager() public view returns (uint256) {
         return wager;
     }
@@ -79,7 +93,11 @@ abstract contract Game {
     // 需要具体 游戏SmartContract 实现的游戏输赢规则
     function getWinnerAndLoser() public virtual returns (address, address);
 
+    function getWinnerAndLoser(
+        uint256[] memory _randomWords
+    ) public virtual returns (address, address);
+
     function getDisplayInfo() public view virtual returns (DisplayInfo memory);
-    
-    function playWithVRF() public virtual;
+
+    // function playWithVRF() public virtual;
 }
