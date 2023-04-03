@@ -8,14 +8,7 @@ import "./BankRoll.sol";
 import "./Game.sol";
 import "./GameDice.sol";
 import "./GameRockPaperScissors.sol";
-
 // TODO: gameType to enum
-
-uint32 constant MUMBAI_CALLBACK_GAS_LIMIT = 2500000;
-uint32 constant MUMBAI_NUM_WORDS = 1;
-uint16 constant REQUEST_CONFIRMATIONS = 3;
-uint64 constant SUBSCRIPTION_ID = 3873; // g - 10593; mumbai - 3873;
-bytes32 constant MUMBAI_KEY_HASH = 0x4b09e658ed251bcafeebbc69400383d49f344ace09b9576fe248bb02c003fe9f; // Mumbai 500 gwei
 
 contract Casino is VRFConsumerBaseV2 {
     IBankRoll private bankRoll;
@@ -32,27 +25,21 @@ contract Casino is VRFConsumerBaseV2 {
     uint16 MINIMUM_REQUEST_CONFIRMATIONS;
     uint32 CALLBACK_GAS_LIMIT;
     uint32 NUM_WORDS;
-
-    // constructor(
-    //     bytes32 keyHash,
-    //     uint64 subId,
-    //     uint16 minimumRequestConfirmations,
-    //     uint32 callbackGasLimit,
-    //     uint32 numWords,
-    //     address VRFCoordinatorV2InterfaceAddress
-    // ) VRFConsumerBaseV2(VRFCoordinatorV2InterfaceAddress) {
-    constructor()
-        VRFConsumerBaseV2(0x7a1BaC17Ccc5b313516C5E16fb24f7659aA5ebed)
-    {
-        vrfCoordinatorV2 = VRFCoordinatorV2Interface(
-            0x7a1BaC17Ccc5b313516C5E16fb24f7659aA5ebed
-        );
-        KEY_HASH = MUMBAI_KEY_HASH;
-        SUB_ID = SUBSCRIPTION_ID;
-        MINIMUM_REQUEST_CONFIRMATIONS = REQUEST_CONFIRMATIONS;
-        CALLBACK_GAS_LIMIT = MUMBAI_CALLBACK_GAS_LIMIT;
-        NUM_WORDS = MUMBAI_NUM_WORDS;
-
+    
+    constructor(
+        bytes32 keyHash,
+        uint64 subId,
+        uint16 minimumRequestConfirmations,
+        uint32 callbackGasLimit,
+        uint32 numWords,
+        address VRFCoordinatorV2InterfaceAddress
+    ) VRFConsumerBaseV2(VRFCoordinatorV2InterfaceAddress) {
+        vrfCoordinatorV2 = VRFCoordinatorV2Interface(VRFCoordinatorV2InterfaceAddress);
+        KEY_HASH = keyHash;
+        SUB_ID = subId;
+        MINIMUM_REQUEST_CONFIRMATIONS = minimumRequestConfirmations;
+        CALLBACK_GAS_LIMIT = callbackGasLimit;
+        NUM_WORDS = numWords;
         owner = msg.sender;
         bankRoll = new BankRoll();
         bankRoll.init(msg.sender);
