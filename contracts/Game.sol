@@ -50,7 +50,7 @@ abstract contract Game {
     // 抽水，默认 10%
     function customizeVigorish() public view returns (uint256) {
         require(wager > 0, "INTERNAL_INIT");
-        return (wager * 10) / 100;
+        return (wager * 0) / 100;
     }
 
     function _play(
