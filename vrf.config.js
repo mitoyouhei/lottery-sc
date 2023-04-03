@@ -20,7 +20,7 @@ export const networkVrfConfigMap = {
   },
   "polygon": {
     keyHash: "0x6e099d640cde6de9d40ac749b4b594126b0169747122711109c9985d47751f93", // 200 gwei, 有更多可以选择
-    subId: 123,// TODO
+    subId: 705,
     minimumRequestConfirmations: 3,
     callbackGasLimit: 2500000,
     numWords: 1,
