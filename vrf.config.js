@@ -12,7 +12,7 @@ export const networkVrfConfigMap = {
   },
   "goerli": {
     keyHash: "0x79d3d8832d904592c0bf9818b621522c988bb8b0c05cdc3b15aea1b6e8db0c15", // 150 gwei
-    subId: 3873,
+    subId: 10593,
     minimumRequestConfirmations: 3,
     callbackGasLimit: 150000,
     numWords: 1,
