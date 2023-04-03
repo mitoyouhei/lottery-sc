@@ -1,15 +1,5 @@
 const { ethers, network } = require("hardhat");
-
-const networkVrfConfigMap = {
-  "mumbai": {
-    keyHash: "0x4b09e658ed251bcafeebbc69400383d49f344ace09b9576fe248bb02c003fe9f", // 500 gwei
-    subId: 3873,
-    minimumRequestConfirmations: 3,
-    callbackGasLimit: 2500000,
-    numWords: 1,
-    VRFCoordinatorV2InterfaceAddress: "0x7a1BaC17Ccc5b313516C5E16fb24f7659aA5ebed"
-  }
-}
+const { networkVrfConfigMap } = require("../vrf.config");
 
 async function main() {
   const [deployer] = await ethers.getSigners();
