@@ -5,15 +5,15 @@ import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 
 import "./BankRoll.sol";
-import "./Game.sol";
 import "./GameDice.sol";
 import "./GameRockPaperScissors.sol";
 // TODO: gameType to enum
 
 contract Casino is VRFConsumerBaseV2 {
+//contract Casino {
     IBankRoll private bankRoll;
-    mapping(address => Game) private activeGameMap;
-    mapping(address => Game) private finishedGameMap;
+    mapping(address => OneOnOneGame) private activeGameMap;
+    mapping(address => OneOnOneGame) private finishedGameMap;
     mapping(uint256 => address) private vrfRequestIdGameMap;
     address[] private games;
     address[] private finishedGames;
@@ -44,6 +44,11 @@ contract Casino is VRFConsumerBaseV2 {
         bankRoll = new BankRoll();
         bankRoll.init(msg.sender);
     }
+//    constructor() {
+//        owner = msg.sender;
+//        bankRoll = new BankRoll();
+//        bankRoll.init(msg.sender);
+//    }
 
     event CreateGame_Event(DisplayInfo game);
     event CompleteGame_Event(address winner);
@@ -55,33 +60,88 @@ contract Casino is VRFConsumerBaseV2 {
     // @Params gameType 用户选择的游戏
     // @Params choice 用户的选项，如 ROCK-PAPER-SCISSORS 游戏中，选择的是 ROCK，PAPER，还是 SCISSORS，用数字表示
     function createGame(uint256 gameType, uint256 choice) public payable {
-        require(gameType > 0, "VALID_GAME");
-        require(gameType < 4, "VALID_GAME");
-        require(msg.value > 0, "NEED_ETH");
-        console.log("owner: ", owner);
-
+        require(msg.value > 0, "NEED_WAGER");
         // 先付钱
         bankRoll.income{value: msg.value}();
-
-        // 创建游戏
-        Game game;
-        // TODO: Contract size 超出限制了，需要处理一下
-        if (gameType == DICE_GAME_TYPE) {
-            game = new Dice();
+        OneOnOneGame game = _createGame(gameType, msg.value, msg.sender);
+        game.join(msg.sender, choice);
+        emit CreateGame_Event(game.getDisplayInfo());
+    }
+    
+    // 游戏开始
+    // @Params targetGame 用户想要加入的游戏的地址
+    // @Params choice 用户的选项，如 ROCK-PAPER-SCISSORS 游戏中，选择的是 ROCK，PAPER，还是 SCISSORS，用数字表示
+    function playGame(address targetGame, uint256 choice) public payable {
+        require(msg.value > 0, "NEED_WAGER");
+    
+        // 找到游戏
+        OneOnOneGame game = activeGameMap[targetGame];
+        // 游戏非 active 状态，revert
+        if (address(game) == address(0)) {
+            revert("GAME_FINISHED");
         }
-        if (gameType == ROCK_PAPER_SCISSORS_GAME_TYPE) {
-            game = new RockPaperScissors();
-        }
-
-        game.init(msg.value);
+    
+        // 先付钱
+        require(msg.value >= game.getWager(), "NEED_MORE");
+        bankRoll.income{value: msg.value}();
         // 加入游戏
         game.join(msg.sender, choice);
+
+        _playGame(game);
+    }
+    
+    function _createGame(uint256 _gameType, uint256 _wager, address _host) private returns (OneOnOneGame) {
+        require(_gameType > 0, "VALID_GAME");
+        require(_gameType < 3, "VALID_GAME");
+        
+        // 创建游戏
+        OneOnOneGame game;
+        if (_gameType == DICE_GAME_TYPE) {
+            game = new Dice(DICE_GAME_TYPE, _host, _wager);
+        }
+        if (_gameType == ROCK_PAPER_SCISSORS_GAME_TYPE) {
+            game = new RockPaperScissors(ROCK_PAPER_SCISSORS_GAME_TYPE, _host, _wager);
+        }
 
         address gameAddress = address(game);
         activeGameMap[gameAddress] = game;
         games.push(gameAddress);
 
+        return game;
+    }
+    
+    function _playGame(OneOnOneGame game) private {
+        address targetGame = address(game);
+        // 游戏启动
+        if (game.gameType() != DICE_GAME_TYPE && !game.isDefaultHost() ) {
+            address winner = game.play(address(bankRoll));
+    
+            //  游戏结束，删除游戏
+            finishedGameMap[targetGame] = game;
+            finishedGames.push(targetGame);
+            delete activeGameMap[targetGame];
+            emit CompleteGame_Event(winner);
+        } else {
+            requestRandom(targetGame);
+        }
+    }
+    
+    // 游戏创建
+    // 用户创建游戏并与 Host 开始玩
+    // @Params gameType 用户选择的游戏
+    // @Params choice 用户的选项，如 ROCK-PAPER-SCISSORS 游戏中，选择的是 ROCK，PAPER，还是 SCISSORS，用数字表示
+    function playGameWithDefaultHost(uint256 gameType, uint256 choice) public payable {
+        require(msg.value > 0, "NEED_WAGER");
+        // 先付钱
+        bankRoll.income{value: msg.value}();
+        // 创建游戏
+        address DEFAULT_GAME_HOST = address(0);
+        OneOnOneGame game = _createGame(gameType, msg.value, DEFAULT_GAME_HOST);
         emit CreateGame_Event(game.getDisplayInfo());
+    
+        // 加入游戏
+        game.join(msg.sender, choice);
+        _playGame(game);
     }
 
     function requestRandom(address gameAddress) public {
@@ -102,53 +162,23 @@ contract Casino is VRFConsumerBaseV2 {
         uint256[] memory _randomWords
     ) internal override {
         emit RandomResultTest_Event(_requestId, _randomWords);
-        Game game = activeGameMap[vrfRequestIdGameMap[_requestId]];
+        OneOnOneGame game = activeGameMap[vrfRequestIdGameMap[_requestId]];
         address winner = game.play(address(bankRoll), _randomWords);
+        
+        //  游戏结束，删除游戏
+        finishedGameMap[address(game)] = game;
+        finishedGames.push(address(game));
+        delete activeGameMap[address(game)];
         emit CompleteGame_Event(winner);
     }
 
-    // 游戏开始
-    // @Params targetGame 用户想要加入的游戏的地址
-    // @Params choice 用户的选项，如 ROCK-PAPER-SCISSORS 游戏中，选择的是 ROCK，PAPER，还是 SCISSORS，用数字表示
-    function playGame(address targetGame, uint256 choice) public payable {
-        require(msg.value > 0, "NEED_WAGER");
-        // 找到游戏
-        Game game = activeGameMap[targetGame];
-        // 游戏非 active 状态，revert
-        if (address(game) == address(0)) {
-            revert("GAME_FINISHED");
-        }
-
-        // 先付钱
-        require(msg.value >= game.getWager(), "NEED_MORE");
-        bankRoll.income{value: msg.value}();
-
-        // 加入游戏
-        game.join(msg.sender, choice);
-
-        if (game.gameType() == DICE_GAME_TYPE) {
-            // 游戏启动
-            requestRandom(targetGame);
-        } else {
-            // 游戏启动
-            address winner = game.play(address(bankRoll));
-
-            //  游戏结束，删除游戏
-            finishedGameMap[targetGame] = game;
-            finishedGames.push(targetGame);
-            delete activeGameMap[targetGame];
-
-            emit CompleteGame_Event(winner);
-        }
-    }
-
     // 获取游戏列表
-    // @returns array< DisplayInfo >, 如果游戏已经结束，则 address 为 address(0)
+    // @returns array< DisplayInfo >
     function getGames() public view returns (DisplayInfo[] memory) {
         DisplayInfo[] memory allGames = new DisplayInfo[](games.length);
         for (uint256 i = 0; i < games.length; i++) {
-            Game activeGame = activeGameMap[games[i]];
-            Game finishedGame = finishedGameMap[games[i]];
+            OneOnOneGame activeGame = activeGameMap[games[i]];
+            OneOnOneGame finishedGame = finishedGameMap[games[i]];
 
             if (address(activeGame) == address(0)) {
                 allGames[i] = finishedGame.getDisplayInfo();
@@ -166,7 +196,7 @@ contract Casino is VRFConsumerBaseV2 {
             games.length - finishedGames.length
         );
         for (uint256 i = 0; i < games.length; i++) {
-            Game game = activeGameMap[games[i]];
+            OneOnOneGame game = activeGameMap[games[i]];
             // 游戏状态为 active，则返回游戏数据
             if (address(game) != address(0)) {
                 activeGames[i] = game.getDisplayInfo();
@@ -180,8 +210,8 @@ contract Casino is VRFConsumerBaseV2 {
     function getGame(
         address targetGame
     ) public view returns (DisplayInfo memory) {
-        Game activeGame = activeGameMap[targetGame];
-        Game finishedGame = finishedGameMap[targetGame];
+        OneOnOneGame activeGame = activeGameMap[targetGame];
+        OneOnOneGame finishedGame = finishedGameMap[targetGame];
 
         if (address(activeGame) == address(0)) {
             return finishedGame.getDisplayInfo();

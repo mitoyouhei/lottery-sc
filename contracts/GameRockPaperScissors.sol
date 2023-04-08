@@ -4,37 +4,41 @@ import "hardhat/console.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 import "./BankRoll.sol";
-import "./Game.sol";
+import "./OneOnOneGame.sol";
 
-contract RockPaperScissors is Game, ReentrancyGuard {
+contract RockPaperScissors is OneOnOneGame, ReentrancyGuard {
     // 石头剪刀布游戏
     // 选项: ROCK: 1; PAPER: 2; SCISSORS: 3;
-    function init(uint256 customizeWager) public override {
-        super.init(customizeWager);
-        gameType = ROCK_PAPER_SCISSORS_GAME_TYPE;
+    constructor(uint256 _gameType, address _host, uint256 _wager) OneOnOneGame(_gameType, _host, _wager){
     }
-
+    
+    function getWinnerAndLoser()
+    public
+    override
+    nonReentrant
+    returns (address, address)
+    {
+        revert("Shouldn't call!");
+    }
+    
     function getWinnerAndLoser(
         uint256[] memory _randomWords
     ) public override nonReentrant returns (address, address) {
-        revert("Shouldn't call!");
-        require(_randomWords.length > 0, "Invalid number of words");
-    }
-
-    function getWinnerAndLoser()
-        public
-        override
-        nonReentrant
-        returns (address, address)
-    {
+        uint256 result = (_randomWords[0] % 3) + 1;
+    
+        if (isDefaultHost()) {
+            Gambler memory playerHost = Gambler({id : host, choice : result});
+            gamblers.push(playerHost);
+        }
+    
         require(gamblers.length == 2, "NEED_TWO_PLAYER");
         Gambler memory gamblerA = gamblers[0];
         Gambler memory gamblerB = gamblers[1];
-
+    
         if (gamblerA.choice == gamblerB.choice) {
             return (address(0), address(0));
         }
-
+    
         bool gamblerBIsWinner = false;
         if (gamblerA.choice == 1) {
             gamblerBIsWinner = gamblerB.choice == 2;
@@ -43,7 +47,7 @@ contract RockPaperScissors is Game, ReentrancyGuard {
         } else if (gamblerA.choice == 3) {
             gamblerBIsWinner = gamblerB.choice == 1;
         }
-
+    
         return
             gamblerBIsWinner
                 ? (gamblerB.id, gamblerA.id)
@@ -56,25 +60,28 @@ contract RockPaperScissors is Game, ReentrancyGuard {
         override
         returns (DisplayInfo memory)
     {
+        // 游戏已经完成，返回所有的数据
+        // 游戏未完成，用户选择隐藏
         Gambler[] memory displayGamblers = new Gambler[](gamblers.length);
-        for (uint8 i = 0; i < gamblers.length; i++) {
-            // 游戏已经完成，返回所有的数据
-            // 游戏未完成，用户选择隐藏
-            if (gamblers.length == 2) {
-                displayGamblers[i] = gamblers[i];
-            } else {
-                displayGamblers[i] = Gambler({
-                    id: gamblers[i].id,
-                    choice: DEFAULT_CHOICE
+        if (isGameActive()) {
+            for (uint8 i = 0; i < gamblers.length; i++) {
+                    displayGamblers[i] = Gambler({
+                    id : gamblers[i].id,
+                    choice : DEFAULT_CHOICE
                 });
             }
+        } else {
+            displayGamblers = gamblers;
         }
+        
         return
             DisplayInfo({
                 id: address(this),
-                wager: wager,
                 gameType: gameType,
-                gamblers: displayGamblers
+                wager: wager,
+                isActive: isActive,
+                gamblers: displayGamblers,
+                host: host
             });
     }
 
