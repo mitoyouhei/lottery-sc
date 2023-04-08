@@ -18,5 +18,9 @@ module.exports = {
       url: process.env.MUMBAI_URL,
       accounts: [process.env.MUMBAI_DEPLOY_ACCOUNT_PRIVATE_KEY],
     },
+    polygon: {
+      url: process.env.POLYGON_URL,
+      accounts: [process.env.POLYGON_DEPLOY_ACCOUNT_PRIVATE_KEY],
+    },
   },
 };
