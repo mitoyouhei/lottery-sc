@@ -61,6 +61,10 @@ abstract contract OneOnOneGame {
         return wager;
     }
     
+    function getHost() public view returns (address) {
+        return host;
+    }
+    
     function _play(
         address _bankRoll,
         address _winner,

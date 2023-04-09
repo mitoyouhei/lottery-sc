@@ -45,9 +45,9 @@ contract Casino is VRFConsumerBaseV2 {
     }
 
     event CreateGame_Event(DisplayInfo game);
-    event CompleteGame_Event(address winner);
-    event RandomRequestTest_Event(uint256 requestId);
-    event RandomResultTest_Event(uint256 requestId, uint256[] randomWords);
+    event CompleteGame_Event(address game, address winner);
+    event VrfRequest_Event(address game, uint256 requestId);
+    event VrfResponse_Event(uint256 requestId, uint256[] randomWords);
 
     // 游戏创建
     // 用户创建游戏，等待另一个玩家加入
@@ -114,7 +114,7 @@ contract Casino is VRFConsumerBaseV2 {
             finishedGameMap[targetGame] = game;
             finishedGames.push(targetGame);
             delete activeGameMap[targetGame];
-            emit CompleteGame_Event(winner);
+            emit CompleteGame_Event(targetGame, winner);
         } else {
             requestRandom(targetGame);
         }
@@ -146,7 +146,7 @@ contract Casino is VRFConsumerBaseV2 {
             NUM_WORDS
         );
 
-        emit RandomRequestTest_Event(requestId);
+        emit VrfRequest_Event(gameAddress, requestId);
         vrfRequestIdGameMap[requestId] = gameAddress;
     }
 
@@ -154,15 +154,16 @@ contract Casino is VRFConsumerBaseV2 {
         uint256 _requestId,
         uint256[] memory _randomWords
     ) internal override {
-        emit RandomResultTest_Event(_requestId, _randomWords);
+        emit VrfResponse_Event(_requestId, _randomWords);
         OneOnOneGame game = activeGameMap[vrfRequestIdGameMap[_requestId]];
         address winner = game.play(address(bankRoll), _randomWords);
         
         //  游戏结束，删除游戏
-        finishedGameMap[address(game)] = game;
-        finishedGames.push(address(game));
-        delete activeGameMap[address(game)];
-        emit CompleteGame_Event(winner);
+        address targetGame = address(game);
+        finishedGameMap[targetGame] = game;
+        finishedGames.push(targetGame);
+        delete activeGameMap[targetGame];
+        emit CompleteGame_Event(targetGame, winner);
     }
 
     // 获取游戏列表
