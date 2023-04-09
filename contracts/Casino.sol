@@ -11,8 +11,8 @@ import "./GameRockPaperScissors.sol";
 
 contract Casino is VRFConsumerBaseV2 {
     IBankRoll private bankRoll;
-    mapping(address => OneOnOneGame) private activeGameMap;
-    mapping(address => OneOnOneGame) private finishedGameMap;
+    mapping(address => Game) private activeGameMap;
+    mapping(address => Game) private finishedGameMap;
     mapping(uint256 => address) private vrfRequestIdGameMap;
     address[] private games;
     address[] private finishedGames;
@@ -57,7 +57,7 @@ contract Casino is VRFConsumerBaseV2 {
         require(msg.value > 0, "NEED_WAGER");
         // 先付钱
         bankRoll.gameIncome{value: msg.value}(msg.sender);
-        OneOnOneGame game = _createGame(gameType, msg.value, msg.sender);
+        Game game = _createGame(gameType, msg.value, msg.sender);
         game.join(msg.sender, choice);
         emit CreateGame_Event(game.getDisplayInfo());
     }
@@ -69,7 +69,7 @@ contract Casino is VRFConsumerBaseV2 {
         require(msg.value > 0, "NEED_WAGER");
     
         // 找到游戏
-        OneOnOneGame game = activeGameMap[targetGame];
+        Game game = activeGameMap[targetGame];
         // 游戏非 active 状态，revert
         if (address(game) == address(0)) {
             revert("GAME_FINISHED");
@@ -84,12 +84,12 @@ contract Casino is VRFConsumerBaseV2 {
         _playGame(game);
     }
     
-    function _createGame(uint256 _gameType, uint256 _wager, address _host) private returns (OneOnOneGame) {
+    function _createGame(uint256 _gameType, uint256 _wager, address _host) private returns (Game) {
         require(_gameType > 0, "VALID_GAME");
         require(_gameType < 3, "VALID_GAME");
         
         // 创建游戏
-        OneOnOneGame game;
+        Game game;
         if (_gameType == DICE_GAME_TYPE) {
             game = new Dice(DICE_GAME_TYPE, _host, _wager);
         }
@@ -104,7 +104,7 @@ contract Casino is VRFConsumerBaseV2 {
         return game;
     }
     
-    function _playGame(OneOnOneGame game) private {
+    function _playGame(Game game) private {
         address targetGame = address(game);
         // 游戏启动
         if (game.gameType() != DICE_GAME_TYPE && !game.isDefaultHost() ) {
@@ -129,7 +129,7 @@ contract Casino is VRFConsumerBaseV2 {
         // 先付钱
         bankRoll.gameIncome{value: msg.value}(msg.sender);
         // 创建游戏
-        OneOnOneGame game = _createGame(gameType, msg.value, DEFAULT_GAME_HOST);
+        Game game = _createGame(gameType, msg.value, DEFAULT_GAME_HOST);
         emit CreateGame_Event(game.getDisplayInfo());
     
         // 加入游戏
@@ -150,12 +150,9 @@ contract Casino is VRFConsumerBaseV2 {
         vrfRequestIdGameMap[requestId] = gameAddress;
     }
 
-    function fulfillRandomWords(
-        uint256 _requestId,
-        uint256[] memory _randomWords
-    ) internal override {
+    function fulfillRandomWords(uint256 _requestId, uint256[] memory _randomWords) internal override {
         emit VrfResponse_Event(_requestId, _randomWords);
-        OneOnOneGame game = activeGameMap[vrfRequestIdGameMap[_requestId]];
+        Game game = activeGameMap[vrfRequestIdGameMap[_requestId]];
         address winner = game.play(address(bankRoll), _randomWords);
         
         //  游戏结束，删除游戏
@@ -171,8 +168,8 @@ contract Casino is VRFConsumerBaseV2 {
     function getGames() public view returns (DisplayInfo[] memory) {
         DisplayInfo[] memory allGames = new DisplayInfo[](games.length);
         for (uint256 i = 0; i < games.length; i++) {
-            OneOnOneGame activeGame = activeGameMap[games[i]];
-            OneOnOneGame finishedGame = finishedGameMap[games[i]];
+            Game activeGame = activeGameMap[games[i]];
+            Game finishedGame = finishedGameMap[games[i]];
 
             if (address(activeGame) == address(0)) {
                 allGames[i] = finishedGame.getDisplayInfo();
@@ -190,7 +187,7 @@ contract Casino is VRFConsumerBaseV2 {
             games.length - finishedGames.length
         );
         for (uint256 i = 0; i < games.length; i++) {
-            OneOnOneGame game = activeGameMap[games[i]];
+            Game game = activeGameMap[games[i]];
             // 游戏状态为 active，则返回游戏数据
             if (address(game) != address(0)) {
                 activeGames[i] = game.getDisplayInfo();
@@ -201,11 +198,9 @@ contract Casino is VRFConsumerBaseV2 {
 
     // 获取游戏
     // @returns array< DisplayInfo >
-    function getGame(
-        address targetGame
-    ) public view returns (DisplayInfo memory) {
-        OneOnOneGame activeGame = activeGameMap[targetGame];
-        OneOnOneGame finishedGame = finishedGameMap[targetGame];
+    function getGame(address targetGame) public view returns (DisplayInfo memory) {
+        Game activeGame = activeGameMap[targetGame];
+        Game finishedGame = finishedGameMap[targetGame];
 
         if (address(activeGame) == address(0)) {
             return finishedGame.getDisplayInfo();
@@ -214,15 +209,17 @@ contract Casino is VRFConsumerBaseV2 {
         }
     }
     
-    function withdraw() public {
+    /*  ************ BANKROLL ************  */
+    // BANKROLL 取现
+    function bankrollWithdraw() public {
         bankRoll.withdraw();
     }
-    
-    function deposit() public payable {
+    // BANKROLL 充值
+    function bankrollDeposit() public payable {
         bankRoll.deposit{value: msg.value}();
     }
-    
-    function getTransactionRecords() public view returns (Record[] memory){
+    // BANKROLL 记录
+    function bankrollGetTransactionRecords() public view returns (Record[] memory){
         return bankRoll.getAllRecords();
     }
 }

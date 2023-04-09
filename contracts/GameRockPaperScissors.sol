@@ -4,12 +4,12 @@ import "hardhat/console.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 import "./BankRoll.sol";
-import "./OneOnOneGame.sol";
+import "./Game.sol";
 
-contract RockPaperScissors is OneOnOneGame, ReentrancyGuard {
+contract RockPaperScissors is Game, ReentrancyGuard {
     // 石头剪刀布游戏
     // 选项: ROCK: 1; PAPER: 2; SCISSORS: 3;
-    constructor(uint256 _gameType, address _host, uint256 _wager) OneOnOneGame(_gameType, _host, _wager){
+    constructor(uint256 _gameType, address _host, uint256 _wager) Game(_gameType, _host, _wager){
     }
     
     function getWinnerAndLoser()
@@ -84,8 +84,4 @@ contract RockPaperScissors is OneOnOneGame, ReentrancyGuard {
                 host: host
             });
     }
-
-    // function playWithVRF() public view override {
-    //     require(gamblers.length == 2, "NEED_TWO_PLAYER");
-    // }
 }

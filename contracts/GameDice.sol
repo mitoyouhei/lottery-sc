@@ -4,12 +4,12 @@ import "hardhat/console.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 import "./BankRoll.sol";
-import "./OneOnOneGame.sol";
+import "./Game.sol";
 
-contract Dice is OneOnOneGame, ReentrancyGuard {
+contract Dice is Game, ReentrancyGuard {
     // 掷骰子游戏
     // 选项: 点数, 1~6;
-    constructor(uint256 _gameType, address _host, uint256 _wager) OneOnOneGame (_gameType, _host, _wager){
+    constructor(uint256 _gameType, address _host, uint256 _wager) Game (_gameType, _host, _wager){
     }
     
     function getWinnerAndLoser()
