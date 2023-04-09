@@ -71,11 +71,11 @@ abstract contract OneOnOneGame {
         if (_winner == _loser) {
              for (uint i = 0; i < gamblers.length; i++) {
                  if (gamblers[i].id != DEFAULT_GAME_HOST) {
-                     bankRoll.payout(payable(gamblers[i].id), refund);
+                     bankRoll.gamePayout(payable(gamblers[i].id), refund);
                  }
              }
         } else {
-            bankRoll.payout(payable(_winner), refund * 2);
+            bankRoll.gamePayout(payable(_winner), refund * 2);
         }
         isActive = false; // TODO：这里稍微有点延迟了
         return _winner;

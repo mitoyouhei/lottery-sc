@@ -62,10 +62,10 @@ abstract contract Game {
         uint256 refund = wager - customizeVigorish();
         if (winner == loser) {
             for (uint i = 0; i < gamblers.length; i++) {
-                bankRoll.payout(payable(gamblers[i].id), refund);
+                bankRoll.gamePayout(payable(gamblers[i].id), refund);
             }
         } else {
-            bankRoll.payout(payable(winner), refund * gamblers.length);
+            bankRoll.gamePayout(payable(winner), refund * gamblers.length);
         }
         emit PlayGame_Event(winner);
 

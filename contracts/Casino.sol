@@ -56,7 +56,7 @@ contract Casino is VRFConsumerBaseV2 {
     function createGame(uint256 gameType, uint256 choice) public payable {
         require(msg.value > 0, "NEED_WAGER");
         // 先付钱
-        bankRoll.income{value: msg.value}();
+        bankRoll.gameIncome{value: msg.value}(msg.sender);
         OneOnOneGame game = _createGame(gameType, msg.value, msg.sender);
         game.join(msg.sender, choice);
         emit CreateGame_Event(game.getDisplayInfo());
@@ -77,7 +77,7 @@ contract Casino is VRFConsumerBaseV2 {
     
         // 先付钱
         require(msg.value >= game.getWager(), "NEED_MORE");
-        bankRoll.income{value: msg.value}();
+        bankRoll.gameIncome{value: msg.value}(msg.sender);
         // 加入游戏
         game.join(msg.sender, choice);
 
@@ -127,7 +127,7 @@ contract Casino is VRFConsumerBaseV2 {
     function playGameWithDefaultHost(uint256 gameType, uint256 choice) public payable {
         require(msg.value > 0, "NEED_WAGER");
         // 先付钱
-        bankRoll.income{value: msg.value}();
+        bankRoll.gameIncome{value: msg.value}(msg.sender);
         // 创建游戏
         OneOnOneGame game = _createGame(gameType, msg.value, DEFAULT_GAME_HOST);
         emit CreateGame_Event(game.getDisplayInfo());
@@ -211,5 +211,17 @@ contract Casino is VRFConsumerBaseV2 {
         } else {
             return activeGame.getDisplayInfo();
         }
+    }
+    
+    function withdraw() public {
+        bankRoll.withdraw();
+    }
+    
+    function deposit() public payable {
+        bankRoll.deposit{value: msg.value}();
+    }
+    
+    function getTransactionRecords() public view returns (Record[] memory){
+        return bankRoll.getAllRecords();
     }
 }
