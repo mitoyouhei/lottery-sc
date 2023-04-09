@@ -10,7 +10,6 @@ import "./GameRockPaperScissors.sol";
 // TODO: gameType to enum
 
 contract Casino is VRFConsumerBaseV2 {
-//contract Casino {
     IBankRoll private bankRoll;
     mapping(address => OneOnOneGame) private activeGameMap;
     mapping(address => OneOnOneGame) private finishedGameMap;
@@ -44,11 +43,6 @@ contract Casino is VRFConsumerBaseV2 {
         bankRoll = new BankRoll();
         bankRoll.init(msg.sender);
     }
-//    constructor() {
-//        owner = msg.sender;
-//        bankRoll = new BankRoll();
-//        bankRoll.init(msg.sender);
-//    }
 
     event CreateGame_Event(DisplayInfo game);
     event CompleteGame_Event(address winner);
@@ -135,7 +129,6 @@ contract Casino is VRFConsumerBaseV2 {
         // 先付钱
         bankRoll.income{value: msg.value}();
         // 创建游戏
-        address DEFAULT_GAME_HOST = address(0);
         OneOnOneGame game = _createGame(gameType, msg.value, DEFAULT_GAME_HOST);
         emit CreateGame_Event(game.getDisplayInfo());
     

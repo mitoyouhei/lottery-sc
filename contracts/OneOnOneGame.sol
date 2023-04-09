@@ -7,6 +7,7 @@ import "./BankRoll.sol";
 uint256 constant DEFAULT_CHOICE = 0; // 保留值
 uint256 constant DICE_GAME_TYPE = 1; // 掷骰子
 uint256 constant ROCK_PAPER_SCISSORS_GAME_TYPE = 2; // 石头剪刀布
+address constant DEFAULT_GAME_HOST = address(0);
 
 struct Gambler {
     address id;
@@ -49,7 +50,7 @@ abstract contract OneOnOneGame {
     }
     
     function isDefaultHost() public view returns (bool) {
-        return host == address(0);
+        return host == DEFAULT_GAME_HOST;
     }
     
     function isGameActive() public view returns (bool) {
