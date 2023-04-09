@@ -69,12 +69,11 @@ abstract contract OneOnOneGame {
         IBankRoll bankRoll = IBankRoll(_bankRoll);
         uint256 refund = wager - customizeVigorish();
         if (_winner == _loser) {
-            // TODO：这里稍微有点延迟了
-//             for (uint i = 0; i < gamblers.length; i++) {
-//                 bankRoll.payout(payable(gamblers[i].id), refund);
-//             }
-//            bankRoll.payout(payable(_winner), refund);
-//            bankRoll.payout(payable(_loser), refund);
+             for (uint i = 0; i < gamblers.length; i++) {
+                 if (gamblers[i].id != DEFAULT_GAME_HOST) {
+                     bankRoll.payout(payable(gamblers[i].id), refund);
+                 }
+             }
         } else {
             bankRoll.payout(payable(_winner), refund * 2);
         }
