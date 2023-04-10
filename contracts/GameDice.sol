@@ -8,7 +8,7 @@ import "./Game.sol";
 contract Dice is Game {
     // 掷骰子游戏
     // 选项: 点数, 1~6;
-    constructor(uint256 _gameType, address _host, uint256 _wager) Game (_gameType, _host, _wager){
+    constructor(uint8 _gameType, address _host, uint256 _wager) Game (_gameType, _host, _wager){
     }
     
     function getWinnerAndLoser()
@@ -22,7 +22,7 @@ contract Dice is Game {
     function getWinnerAndLoser(
         uint256[] memory _randomWords
     ) public override returns (address, address) {
-        uint256 roll = (_randomWords[0] % 6) + 1;
+        uint8 roll = uint8((_randomWords[0] % 6) + 1);
         
         if (isDefaultHost()) {
             Gambler memory playerHost = Gambler({id : host, choice : roll});

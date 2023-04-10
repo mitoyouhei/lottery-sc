@@ -8,7 +8,7 @@ import "./Game.sol";
 contract RockPaperScissors is Game {
     // 石头剪刀布游戏
     // 选项: ROCK: 1; PAPER: 2; SCISSORS: 3;
-    constructor(uint256 _gameType, address _host, uint256 _wager) Game(_gameType, _host, _wager){
+    constructor(uint8 _gameType, address _host, uint256 _wager) Game(_gameType, _host, _wager){
     }
     
     function getWinnerAndLoser()
@@ -22,7 +22,7 @@ contract RockPaperScissors is Game {
     function getWinnerAndLoser(
         uint256[] memory _randomWords
     ) public override returns (address, address) {
-        uint256 result = (_randomWords[0] % 3) + 1;
+        uint8 result = uint8((_randomWords[0] % 3) + 1);
     
         if (isDefaultHost()) {
             Gambler memory playerHost = Gambler({id : host, choice : result});
