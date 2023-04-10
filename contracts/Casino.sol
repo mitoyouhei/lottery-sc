@@ -55,9 +55,10 @@ contract Casino is VRFConsumerBaseV2 {
     // @Params choice 用户的选项，如 ROCK-PAPER-SCISSORS 游戏中，选择的是 ROCK，PAPER，还是 SCISSORS，用数字表示
     function createGame(uint256 gameType, uint256 choice) public payable {
         require(msg.value > 0, "NEED_WAGER");
-        // 先付钱
-        bankRoll.gameIncome{value: msg.value}(msg.sender);
         Game game = _createGame(gameType, msg.value, msg.sender);
+        // 先付钱
+        bankRoll.gameIncome{value: msg.value}(msg.sender, address(game));
+        
         game.join(msg.sender, choice);
         emit CreateGame_Event(game.getDisplayInfo());
     }
@@ -77,7 +78,7 @@ contract Casino is VRFConsumerBaseV2 {
     
         // 先付钱
         require(msg.value >= game.getWager(), "NEED_MORE");
-        bankRoll.gameIncome{value: msg.value}(msg.sender);
+        bankRoll.gameIncome{value: msg.value}(msg.sender, address(game));
         // 加入游戏
         game.join(msg.sender, choice);
 
@@ -126,10 +127,10 @@ contract Casino is VRFConsumerBaseV2 {
     // @Params choice 用户的选项，如 ROCK-PAPER-SCISSORS 游戏中，选择的是 ROCK，PAPER，还是 SCISSORS，用数字表示
     function playGameWithDefaultHost(uint256 gameType, uint256 choice) public payable {
         require(msg.value > 0, "NEED_WAGER");
-        // 先付钱
-        bankRoll.gameIncome{value: msg.value}(msg.sender);
         // 创建游戏
         Game game = _createGame(gameType, msg.value, DEFAULT_GAME_HOST);
+        // 先付钱
+        bankRoll.gameIncome{value: msg.value}(msg.sender, address(game));
         emit CreateGame_Event(game.getDisplayInfo());
     
         // 加入游戏
