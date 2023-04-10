@@ -4,34 +4,34 @@ import "hardhat/console.sol";
 
 import "./BankRoll.sol";
 
-uint8 constant DEFAULT_CHOICE = 0; // 保留值
-uint8 constant DICE_GAME_TYPE = 1; // 掷骰子
-uint8 constant ROCK_PAPER_SCISSORS_GAME_TYPE = 2; // 石头剪刀布
+uint256 constant DEFAULT_CHOICE = 0; // 保留值
+uint256 constant DICE_GAME_TYPE = 1; // 掷骰子
+uint256 constant ROCK_PAPER_SCISSORS_GAME_TYPE = 2; // 石头剪刀布
 address constant DEFAULT_GAME_HOST = address(0);
 
 struct Gambler {
     address id;
-    uint8 choice;
+    uint256 choice;
 }
 
 struct DisplayInfo {
     address id;
     address host;
-    uint8 gameType;
+    uint256 gameType;
     uint256 wager;
     bool isActive;
     Gambler[] gamblers;
 }
 
 abstract contract Game {
-    uint8 public gameType;
+    uint256 public gameType;
     address public host;
     uint256 public wager;
     address public winner;
     bool public isActive;
     Gambler[] gamblers;
     
-    constructor(uint8 _gameType, address _host, uint256 _wager){
+    constructor(uint256 _gameType, address _host, uint256 _wager){
         gameType = _gameType;
         host = _host;
         wager = _wager;
@@ -39,14 +39,14 @@ abstract contract Game {
     }
     
     // 玩家加入游戏
-    function join(address _gamblerAddress, uint8 _choice) public payable {
+    function join(address _gamblerAddress, uint256 _choice) public payable {
         Gambler memory gambler = Gambler({id : _gamblerAddress, choice : _choice});
         gamblers.push(gambler);
     }
     
     // TODO 抽水
     function customizeVigorish() public view returns (uint256) {
-        return 0;
+        return (wager * 50) / 100;
     }
     
     function isDefaultHost() public view returns (bool) {

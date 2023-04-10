@@ -31,7 +31,7 @@ contract Casino is VRFConsumerBaseV2 {
         uint32 callbackGasLimit,
         uint32 numWords,
         uint64 subId,
-    address VRFCoordinatorV2InterfaceAddress
+        address VRFCoordinatorV2InterfaceAddress
     ) VRFConsumerBaseV2(VRFCoordinatorV2InterfaceAddress) {
         vrfCoordinatorV2 = VRFCoordinatorV2Interface(VRFCoordinatorV2InterfaceAddress);
         KEY_HASH = keyHash;
@@ -43,7 +43,6 @@ contract Casino is VRFConsumerBaseV2 {
         bankRoll = new BankRoll();
         bankRoll.init(msg.sender);
     }
-
     event CreateGame_Event(DisplayInfo game);
     event CompleteGame_Event(address game, address winner);
     event VrfRequest_Event(address game, uint256 requestId);
@@ -53,7 +52,7 @@ contract Casino is VRFConsumerBaseV2 {
     // 用户创建游戏，等待另一个玩家加入
     // @Params gameType 用户选择的游戏
     // @Params choice 用户的选项，如 ROCK-PAPER-SCISSORS 游戏中，选择的是 ROCK，PAPER，还是 SCISSORS，用数字表示
-    function createGame(uint8 gameType, uint8 choice) public payable {
+    function createGame(uint256 gameType, uint256 choice) public payable {
         require(msg.value > 0, "NEED_WAGER");
         Game game = _createGame(gameType, msg.value, msg.sender);
         // 先付钱
@@ -66,7 +65,7 @@ contract Casino is VRFConsumerBaseV2 {
     // 游戏开始
     // @Params targetGame 用户想要加入的游戏的地址
     // @Params choice 用户的选项，如 ROCK-PAPER-SCISSORS 游戏中，选择的是 ROCK，PAPER，还是 SCISSORS，用数字表示
-    function playGame(address targetGame, uint8 choice) public payable {
+    function playGame(address targetGame, uint256 choice) public payable {
         require(msg.value > 0, "NEED_WAGER");
     
         // 找到游戏
@@ -85,7 +84,7 @@ contract Casino is VRFConsumerBaseV2 {
         _playGame(game);
     }
     
-    function _createGame(uint8 _gameType, uint256 _wager, address _host) private returns (Game) {
+    function _createGame(uint256 _gameType, uint256 _wager, address _host) private returns (Game) {
         require(_gameType > 0, "VALID_GAME");
         require(_gameType < 3, "VALID_GAME");
         
@@ -125,7 +124,7 @@ contract Casino is VRFConsumerBaseV2 {
     // 用户创建游戏并与 Host 开始玩
     // @Params gameType 用户选择的游戏
     // @Params choice 用户的选项，如 ROCK-PAPER-SCISSORS 游戏中，选择的是 ROCK，PAPER，还是 SCISSORS，用数字表示
-    function playGameWithDefaultHost(uint8 gameType, uint8 choice) public payable {
+    function playGameWithDefaultHost(uint256 gameType, uint256 choice) public payable {
         require(msg.value > 0, "NEED_WAGER");
         // 创建游戏
         Game game = _createGame(gameType, msg.value, DEFAULT_GAME_HOST);
@@ -168,7 +167,7 @@ contract Casino is VRFConsumerBaseV2 {
     // @returns array< DisplayInfo >
     function getGames() public view returns (DisplayInfo[] memory) {
         DisplayInfo[] memory allGames = new DisplayInfo[](games.length);
-        for (uint8 i = 0; i < games.length; i++) {
+        for (uint256 i = 0; i < games.length; i++) {
             Game activeGame = activeGameMap[games[i]];
             Game finishedGame = finishedGameMap[games[i]];
 
@@ -181,21 +180,21 @@ contract Casino is VRFConsumerBaseV2 {
         return allGames;
     }
 
-    // 获取游戏列表
-    // @returns array< DisplayInfo >
-    function getActiveGames() public view returns (DisplayInfo[] memory) {
-        DisplayInfo[] memory activeGames = new DisplayInfo[](
-            games.length - finishedGames.length
-        );
-        for (uint8 i = 0; i < games.length; i++) {
-            Game game = activeGameMap[games[i]];
-            // 游戏状态为 active，则返回游戏数据
-            if (address(game) != address(0)) {
-                activeGames[i] = game.getDisplayInfo();
-            }
-        }
-        return activeGames;
-    }
+//    // 获取游戏列表
+//    // @returns array< DisplayInfo >
+//    function getActiveGames() public view returns (DisplayInfo[] memory) {
+//        DisplayInfo[] memory activeGames = new DisplayInfo[](
+//            games.length - finishedGames.length
+//        );
+//        for (uint256 i = 0; i < games.length; i++) {
+//            Game game = activeGameMap[games[i]];
+//            // 游戏状态为 active，则返回游戏数据
+//            if (address(game) != address(0)) {
+//                activeGames[i] = game.getDisplayInfo();
+//            }
+//        }
+//        return activeGames;
+//    }
 
     // 获取游戏
     // @returns array< DisplayInfo >
@@ -211,16 +210,21 @@ contract Casino is VRFConsumerBaseV2 {
     }
     
     /*  ************ BANKROLL ************  */
-    // BANKROLL 取现
-    function bankrollWithdraw() public {
-        bankRoll.withdraw();
-    }
-    // BANKROLL 充值
-    function bankrollDeposit() public payable {
-        bankRoll.deposit{value: msg.value}();
-    }
+    // over size
+//    // BANKROLL 取现
+//    function bankrollWithdraw() public {
+//        bankRoll.withdraw();
+//    }
+//    // BANKROLL 充值
+//    function bankrollDeposit() public payable {
+//        bankRoll.deposit{value: msg.value}();
+//    }
     // BANKROLL 记录
     function bankrollGetTransactionRecords() public view returns (Record[] memory){
         return bankRoll.getAllRecords();
+    }
+    // BANKROLL 记录
+    function bankrollGetBalance() public view returns (uint256){
+        return bankRoll.showBalance();
     }
 }

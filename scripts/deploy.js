@@ -19,10 +19,10 @@ async function main() {
 
   const casino = await Casino.deploy(
     vrfConfig.keyHash,
-    vrfConfig.subId,
     vrfConfig.minimumRequestConfirmations,
     vrfConfig.callbackGasLimit,
     vrfConfig.numWords,
+    vrfConfig.subId,
     vrfConfig.VRFCoordinatorV2InterfaceAddress
   );
   console.log("Casino address:", casino.address);
