@@ -1,6 +1,7 @@
 require("@nomicfoundation/hardhat-toolbox");
 require("dotenv").config();
 require("solidity-coverage");
+require('hardhat-contract-sizer');
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
@@ -23,4 +24,10 @@ module.exports = {
       accounts: [process.env.POLYGON_DEPLOY_ACCOUNT_PRIVATE_KEY],
     },
   },
+  contractSizer: {
+    alphaSort: true,
+    disambiguatePaths: false,
+    runOnCompile: true,
+    strict: true,
+  }
 };
