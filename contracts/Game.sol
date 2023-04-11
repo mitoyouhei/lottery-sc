@@ -25,8 +25,8 @@ struct DisplayInfo {
 
 abstract contract Game {
     uint256 public gameType;
-    address public host;
     uint256 public wager;
+    address public host;
     address public winner;
     bool public isActive;
     Gambler[] gamblers;

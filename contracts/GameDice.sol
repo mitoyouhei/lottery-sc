@@ -11,11 +11,7 @@ contract Dice is Game {
     constructor(uint256 _gameType, address _host, uint256 _wager) Game (_gameType, _host, _wager){
     }
     
-    function getWinnerAndLoser()
-        public
-        override
-        returns (address, address)
-    {
+    function getWinnerAndLoser() public pure override returns (address, address){
         revert("Shouldn't call!");
     }
 
