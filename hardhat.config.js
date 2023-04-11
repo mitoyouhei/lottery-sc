@@ -5,7 +5,14 @@ require('hardhat-contract-sizer');
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
-  solidity: "0.8.19",
+  solidity: {
+    version: "0.8.19",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 1000, // default 200
+    },
+  },
   networks: {
     ganache: {
       url: process.env.GANACHE_URL,
