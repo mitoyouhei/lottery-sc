@@ -65,6 +65,10 @@ abstract contract Game {
         return host;
     }
     
+    function getGamblers() public view returns (Gambler[] memory) {
+        return gamblers;
+    }
+    
     function _play(
         address _bankRoll,
         address _winner,

@@ -4,6 +4,7 @@ import "hardhat/console.sol";
 
 import "./BankRoll.sol";
 import "./Game.sol";
+import "./GameWinner.sol";
 
 contract Dice is Game {
     // 掷骰子游戏
@@ -15,29 +16,8 @@ contract Dice is Game {
         revert("Shouldn't call!");
     }
 
-    function getWinnerAndLoser(
-        uint256[] memory _randomWords
-    ) public override returns (address, address) {
-        uint256 roll = (_randomWords[0] % 6) + 1;
-        
-        if (isDefaultHost()) {
-            Gambler memory playerHost = Gambler({id : host, choice : roll});
-            gamblers.push(playerHost);
-        }
-    
-        require(gamblers.length == 2, "NEED_TWO_PLAYER");
-        Gambler memory gamblerA = gamblers[0];
-        Gambler memory gamblerB = gamblers[1];
-        
-        bool winnerIsBig = roll >= 4;
-        bool gamblerBIsBig = gamblerB.choice >= 4;
-        bool gamblerBIsWinner = (winnerIsBig && gamblerBIsBig) ||
-        (!winnerIsBig && !gamblerBIsBig);
-    
-        return
-            gamblerBIsWinner
-                ? (gamblerB.id, gamblerA.id)
-                : (gamblerA.id, gamblerB.id);
+    function getWinnerAndLoser(uint256[] memory _randomWords) public override returns (address, address) {
+        return GameWinner.getWinnerAndLoserForDice(this, _randomWords);
     }
 
     function getDisplayInfo()

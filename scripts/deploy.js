@@ -9,7 +9,16 @@ async function main() {
   console.log("Account:", deployer.address);
   console.log("Account balance:", (await deployer.getBalance()).toString());
 
-  const Casino = await ethers.getContractFactory("Casino");
+  // Library deployment
+  const libGameWinner = await ethers.getContractFactory("GameWinner");
+  const libGameWinnerInstance = await libGameWinner.deploy();
+  console.log("libGameWinner address:", libGameWinnerInstance.address);
+
+  const Casino = await ethers.getContractFactory("Casino", {
+    libraries: {
+      GameWinner: libGameWinnerInstance.address,
+    }
+  });
   const vrfConfig = networkVrfConfigMap[network.name];
   console.log("VRF Config", vrfConfig);
   if(!vrfConfig) {

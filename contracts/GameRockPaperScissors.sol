@@ -4,6 +4,7 @@ import "hardhat/console.sol";
 
 import "./BankRoll.sol";
 import "./Game.sol";
+import "./GameWinner.sol";
 
 contract RockPaperScissors is Game {
     // 石头剪刀布游戏
@@ -15,37 +16,8 @@ contract RockPaperScissors is Game {
         revert("Shouldn't call!");
     }
     
-    function getWinnerAndLoser(
-        uint256[] memory _randomWords
-    ) public override returns (address, address) {
-        uint256 result = (_randomWords[0] % 3) + 1;
-    
-        if (isDefaultHost()) {
-            Gambler memory playerHost = Gambler({id : host, choice : result});
-            gamblers.push(playerHost);
-        }
-    
-        require(gamblers.length == 2, "NEED_TWO_PLAYER");
-        Gambler memory gamblerA = gamblers[0];
-        Gambler memory gamblerB = gamblers[1];
-    
-        if (gamblerA.choice == gamblerB.choice) {
-            return (address(0), address(0));
-        }
-    
-        bool gamblerBIsWinner = false;
-        if (gamblerA.choice == 1) {
-            gamblerBIsWinner = gamblerB.choice == 2;
-        } else if (gamblerA.choice == 2) {
-            gamblerBIsWinner = gamblerB.choice == 3;
-        } else if (gamblerA.choice == 3) {
-            gamblerBIsWinner = gamblerB.choice == 1;
-        }
-    
-        return
-            gamblerBIsWinner
-                ? (gamblerB.id, gamblerA.id)
-                : (gamblerA.id, gamblerB.id);
+    function getWinnerAndLoser(uint256[] memory _randomWords) public override returns (address, address) {
+        return GameWinner.getWinnerAndLoserForRPS(this, _randomWords);
     }
 
     function getDisplayInfo()

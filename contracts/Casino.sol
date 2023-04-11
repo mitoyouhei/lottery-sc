@@ -145,7 +145,6 @@ contract Casino is VRFConsumerBaseV2 {
             CALLBACK_GAS_LIMIT,
             NUM_WORDS
         );
-
         emit VrfRequest_Event(gameAddress, requestId);
         vrfRequestIdGameMap[requestId] = gameAddress;
     }
@@ -219,12 +218,12 @@ contract Casino is VRFConsumerBaseV2 {
 //    function bankrollDeposit() public payable {
 //        bankRoll.deposit{value: msg.value}();
 //    }
-    // BANKROLL 记录
-    function bankrollGetTransactionRecords() public view returns (Record[] memory){
-        return bankRoll.getAllRecords();
-    }
-    // BANKROLL 记录
-    function bankrollGetBalance() public view returns (uint256){
-        return bankRoll.showBalance();
-    }
+//    // BANKROLL 记录
+//    function bankrollGetTransactionRecords() public view returns (Record[] memory){
+//        return bankRoll.getAllRecords();
+//    }
+//    // BANKROLL 记录
+//    function bankrollGetBalance() public view returns (uint256){
+//        return bankRoll.showBalance();
+//    }
 }
