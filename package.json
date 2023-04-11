@@ -8,7 +8,8 @@
     "coverage": "hardhat coverage",
     "deploy-mumbai": "hardhat run scripts/deploy.js --network mumbai",
     "deploy-polygon": "hardhat run scripts/deploy.js --network polygon",
-    "deploy-local": "hardhat run scripts/deploy.js --network ganache"
+    "deploy-local": "hardhat run scripts/deploy.js --network ganache",
+    "size": "npx hardhat size-contracts"
   },
   "repository": {
     "type": "git",
