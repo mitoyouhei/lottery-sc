@@ -29,7 +29,7 @@ contract RockPaperScissors is Game {
         // 游戏已经完成，返回所有的数据
         // 游戏未完成，用户选择隐藏
         Gambler[] memory displayGamblers = new Gambler[](gamblers.length);
-        if (isGameActive()) {
+        if (isActive) {
             for (uint256 i = 0; i < gamblers.length; i++) {
                     displayGamblers[i] = Gambler({
                     id : gamblers[i].id,

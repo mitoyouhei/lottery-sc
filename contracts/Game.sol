@@ -29,7 +29,7 @@ abstract contract Game {
     address public host;
     address public winner;
     bool public isActive;
-    Gambler[] gamblers;
+    Gambler[] public gamblers;
     
     constructor(uint256 _gameType, address _host, uint256 _wager){
         gameType = _gameType;
@@ -53,22 +53,10 @@ abstract contract Game {
         return host == DEFAULT_GAME_HOST;
     }
     
-    function isGameActive() public view returns (bool) {
-        return isActive;
+    function getGamblerLength() public view returns (uint256) {
+        return gamblers.length;
     }
-    
-    function getWager() public view returns (uint256) {
-        return wager;
-    }
-    
-    function getHost() public view returns (address) {
-        return host;
-    }
-    
-    function getGamblers() public view returns (Gambler[] memory) {
-        return gamblers;
-    }
-    
+  
     function _play(
         address _bankRoll,
         address _winner,

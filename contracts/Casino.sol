@@ -76,7 +76,7 @@ contract Casino is VRFConsumerBaseV2 {
         }
     
         // 先付钱
-        require(msg.value >= game.getWager(), "NEED_MORE");
+        require(msg.value >= game.wager(), "NEED_MORE");
         bankRoll.gameIncome{value: msg.value}(msg.sender, address(game));
         // 加入游戏
         game.join(msg.sender, choice);
