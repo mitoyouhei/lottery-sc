@@ -2,9 +2,9 @@
 pragma solidity >=0.8.18 <0.9.0;
 import "hardhat/console.sol";
 
-import "./BankRoll.sol";
-import "./Game.sol";
-import "./GameWinner.sol";
+import "./source/BankRoll.sol";
+import "./source/Game.sol";
+import "./source/GameWinner.sol";
 
 contract RockPaperScissors is Game {
     // 石头剪刀布游戏

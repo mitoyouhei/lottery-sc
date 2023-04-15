@@ -4,7 +4,7 @@ import "hardhat/console.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 
-import "./BankRoll.sol";
+import "./source/BankRoll.sol";
 import "./GameDice.sol";
 import "./GameRockPaperScissors.sol";
 
