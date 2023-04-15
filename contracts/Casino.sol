@@ -7,15 +7,12 @@ import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 import "./BankRoll.sol";
 import "./GameDice.sol";
 import "./GameRockPaperScissors.sol";
-// TODO: gameType to enum
 
 contract Casino is VRFConsumerBaseV2 {
     IBankRoll private bankRoll;
     mapping(address => Game) private activeGameMap;
-    mapping(address => Game) private finishedGameMap;
     mapping(uint256 => address) private vrfRequestIdGameMap;
     address[] private games;
-    address[] private finishedGames;
     address private owner;
 
     VRFCoordinatorV2Interface vrfCoordinatorV2;
@@ -109,10 +106,6 @@ contract Casino is VRFConsumerBaseV2 {
         // 游戏启动
         if (game.gameType() != DICE_GAME_TYPE && !game.isDefaultHost() ) {
             address winner = game.play(address(bankRoll));
-    
-            //  游戏结束，删除游戏
-            finishedGameMap[targetGame] = game;
-            finishedGames.push(targetGame);
             delete activeGameMap[targetGame];
             emit CompleteGame_Event(targetGame, winner);
         } else {
@@ -153,13 +146,7 @@ contract Casino is VRFConsumerBaseV2 {
         emit VrfResponse_Event(_requestId, _randomWords);
         Game game = activeGameMap[vrfRequestIdGameMap[_requestId]];
         address winner = game.play(address(bankRoll), _randomWords);
-        
-        //  游戏结束，删除游戏
-        address targetGame = address(game);
-        finishedGameMap[targetGame] = game;
-        finishedGames.push(targetGame);
-        delete activeGameMap[targetGame];
-        emit CompleteGame_Event(targetGame, winner);
+        emit CompleteGame_Event(address(game), winner);
     }
 
     // 获取游戏列表
@@ -168,62 +155,34 @@ contract Casino is VRFConsumerBaseV2 {
         DisplayInfo[] memory allGames = new DisplayInfo[](games.length);
         for (uint256 i = 0; i < games.length; i++) {
             Game activeGame = activeGameMap[games[i]];
-            Game finishedGame = finishedGameMap[games[i]];
-
-            if (address(activeGame) == address(0)) {
-                allGames[i] = finishedGame.getDisplayInfo();
-            } else {
-                allGames[i] = activeGame.getDisplayInfo();
-            }
+            allGames[i] = activeGame.getDisplayInfo();
         }
         return allGames;
     }
-
-//    // 获取游戏列表
-//    // @returns array< DisplayInfo >
-//    function getActiveGames() public view returns (DisplayInfo[] memory) {
-//        DisplayInfo[] memory activeGames = new DisplayInfo[](
-//            games.length - finishedGames.length
-//        );
-//        for (uint256 i = 0; i < games.length; i++) {
-//            Game game = activeGameMap[games[i]];
-//            // 游戏状态为 active，则返回游戏数据
-//            if (address(game) != address(0)) {
-//                activeGames[i] = game.getDisplayInfo();
-//            }
-//        }
-//        return activeGames;
-//    }
-
-    // 获取游戏
+    
+    // 获取游戏信息
     // @returns array< DisplayInfo >
     function getGame(address targetGame) public view returns (DisplayInfo memory) {
         Game activeGame = activeGameMap[targetGame];
-        Game finishedGame = finishedGameMap[targetGame];
-
-        if (address(activeGame) == address(0)) {
-            return finishedGame.getDisplayInfo();
-        } else {
-            return activeGame.getDisplayInfo();
-        }
+        // TODO: no game error
+        return activeGame.getDisplayInfo();
     }
     
     /*  ************ BANKROLL ************  */
-    // over size
-//    // BANKROLL 取现
-//    function bankrollWithdraw() public {
-//        bankRoll.withdraw();
-//    }
-//    // BANKROLL 充值
-//    function bankrollDeposit() public payable {
-//        bankRoll.deposit{value: msg.value}();
-//    }
-//    // BANKROLL 记录
-//    function bankrollGetTransactionRecords() public view returns (Record[] memory){
-//        return bankRoll.getAllRecords();
-//    }
-//    // BANKROLL 记录
-//    function bankrollGetBalance() public view returns (uint256){
-//        return bankRoll.showBalance();
-//    }
+    // BANKROLL 取现
+    function bankrollWithdraw() public {
+        bankRoll.withdraw();
+    }
+    // BANKROLL 充值
+    function bankrollDeposit() public payable {
+        bankRoll.deposit{value: msg.value}();
+    }
+    // BANKROLL 记录
+    function bankrollGetTransactionRecords() public view returns (Record[] memory){
+        return bankRoll.getAllRecords();
+    }
+    // BANKROLL 记录
+    function bankrollGetBalance() public view returns (uint256){
+        return bankRoll.showBalance();
+    }
 }

@@ -89,6 +89,7 @@ abstract contract Game {
         uint256[] memory _randomWords
     ) public returns (address) {
         (address _winner, address _loser) = getWinnerAndLoser(_randomWords);
+        winner = _winner;
         return _play(_bankRoll, _winner, _loser);
     }
     
