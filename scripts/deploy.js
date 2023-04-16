@@ -13,10 +13,14 @@ async function main() {
   const libGameWinner = await ethers.getContractFactory("GameWinner");
   const libGameWinnerInstance = await libGameWinner.deploy();
   console.log("libGameWinner address:", libGameWinnerInstance.address);
+  const vigorish = await ethers.getContractFactory("Vigorish");
+  const libvigorishInstance = await vigorish.deploy();
+  console.log("libVigorish address:", libvigorishInstance.address);
 
   const Casino = await ethers.getContractFactory("Casino", {
     libraries: {
       GameWinner: libGameWinnerInstance.address,
+      Vigorish: libvigorishInstance.address,
     }
   });
   const vrfConfig = networkVrfConfigMap[network.name];
