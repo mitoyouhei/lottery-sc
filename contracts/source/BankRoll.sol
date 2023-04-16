@@ -14,7 +14,7 @@ interface IBankRoll {
     
     function gameIncome(address _playerAddress, address _gameAddress) external payable;
     
-    function gamePayout(address payable target, uint256 balance) external;
+    function gamePayout(address payable _sendTo, uint256 _balance) external;
     
     function withdraw() external;
     
