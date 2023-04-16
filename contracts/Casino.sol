@@ -54,24 +54,24 @@ contract Casino is VRFConsumerBaseV2 {
         Game game = _createGame(gameType, msg.value, msg.sender);
         // 先付钱
         bankRoll.gameIncome{value: msg.value}(msg.sender, address(game));
-        
+
         game.join(msg.sender, choice);
         emit CreateGame_Event(game.getDisplayInfo());
     }
-    
+
     // 游戏开始
     // @Params targetGame 用户想要加入的游戏的地址
     // @Params choice 用户的选项，如 ROCK-PAPER-SCISSORS 游戏中，选择的是 ROCK，PAPER，还是 SCISSORS，用数字表示
     function playGame(address targetGame, uint256 choice) public payable {
         require(msg.value > 0, "NEED_WAGER");
-    
+
         // 找到游戏
         Game game = activeGameMap[targetGame];
         // 游戏非 active 状态，revert
         if (address(game) == address(0)) {
             revert("GAME_FINISHED");
         }
-    
+
         // 先付钱
         require(msg.value >= game.wager(), "NEED_MORE");
         bankRoll.gameIncome{value: msg.value}(msg.sender, address(game));
@@ -109,7 +109,7 @@ contract Casino is VRFConsumerBaseV2 {
             delete activeGameMap[targetGame];
             emit CompleteGame_Event(targetGame, winner);
         } else {
-            requestRandom(targetGame);
+            _requestRandom(targetGame);
         }
     }
     
@@ -130,7 +130,7 @@ contract Casino is VRFConsumerBaseV2 {
         _playGame(game);
     }
 
-    function requestRandom(address gameAddress) public {
+    function _requestRandom(address gameAddress) private {
         uint256 requestId = vrfCoordinatorV2.requestRandomWords(
             KEY_HASH,
             SUB_ID,
@@ -151,13 +151,12 @@ contract Casino is VRFConsumerBaseV2 {
 
     // 获取游戏列表
     // @returns array< DisplayInfo >
-    function getGames() public view returns (DisplayInfo[] memory) {
+    function getGames() public view returns (DisplayInfo[] memory allGames) {
         DisplayInfo[] memory allGames = new DisplayInfo[](games.length);
         for (uint256 i = 0; i < games.length; i++) {
             Game activeGame = activeGameMap[games[i]];
             allGames[i] = activeGame.getDisplayInfo();
         }
-        return allGames;
     }
     
     // 获取游戏信息
