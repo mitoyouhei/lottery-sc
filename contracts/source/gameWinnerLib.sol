@@ -6,21 +6,28 @@ import "./Game.sol";
 
 library GameWinner {
 	function getWinnerAndLoserForDice(Game self, uint256[] memory _randomWords) public returns (address, address) {
-		uint256 roll = (_randomWords[0] % 6) + 1;
+		uint256 result = (_randomWords[0] % 6) + 1;
 		if (self.isDefaultHost()) {
-			self.join(self.host(), roll);
+			self.join(self.host(), result);
 		}
-		
+		self.setResult(result);
+	
 		require(self.getGamblerLength() == 2, "NEED_TWO_PLAYER");
-		(address gamblerAId, uint256 gamblerAChoice) = self.gamblers(0);
-		(address gamblerBId, ) = self.gamblers(1);
+		(address gamblerAId, uint256 gamblerAChoice,) = self.gamblers(0);
+		(address gamblerBId, ,) = self.gamblers(1);
 		
-		bool winnerIsBig = roll >= 4;
+		bool winnerIsBig = result >= 4;
 		bool gamblerAIsBig = gamblerAChoice >= 4;
 		bool gamblerAIsWinner = (winnerIsBig && gamblerAIsBig) ||
 		(!winnerIsBig && !gamblerAIsBig);
 		
-		return gamblerAIsWinner ? (gamblerAId,gamblerBId) : (gamblerBId, gamblerAId);
+		if (gamblerAIsWinner) {
+			self.setWinner(gamblerAId);
+			return (gamblerAId, gamblerBId);
+		} else {
+			self.setWinner(gamblerBId);
+			return (gamblerBId, gamblerAId);
+		}
 	}
 	
 	function getWinnerAndLoserForRPS(Game self, uint256[] memory _randomWords) public returns (address, address) {
@@ -28,10 +35,11 @@ library GameWinner {
 		if (self.isDefaultHost()) {
 			self.join(self.host(), result);
 		}
+		self.setResult(result);
 		
 		require(self.getGamblerLength() == 2, "NEED_TWO_PLAYER");
-		(address gamblerAId, uint256 gamblerAChoice) = self.gamblers(1);
-		(address gamblerBId, uint256 gamblerBChoice) = self.gamblers(0);
+		(address gamblerAId, uint256 gamblerAChoice,) = self.gamblers(1);
+		(address gamblerBId, uint256 gamblerBChoice,) = self.gamblers(0);
 		
 		if (gamblerAChoice == gamblerBChoice) {
 			return (address(0), address(0));
@@ -46,6 +54,12 @@ library GameWinner {
 			gamblerBIsWinner = gamblerBChoice == 1;
 		}
 		
-		return gamblerBIsWinner ? (gamblerBId, gamblerAId) : (gamblerAId, gamblerBId);
+		if (gamblerBIsWinner) {
+			self.setWinner(gamblerBId);
+			return (gamblerBId, gamblerAId);
+		} else {
+			self.setWinner(gamblerAId);
+			return (gamblerAId, gamblerBId);
+		}
 	}
 }

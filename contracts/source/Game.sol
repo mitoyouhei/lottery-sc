@@ -13,6 +13,7 @@ address constant DEFAULT_GAME_HOST = address(0);
 struct Gambler {
     address id;
     uint256 choice;
+    bool isWinner;
 }
 
 struct DisplayInfo {
@@ -27,8 +28,9 @@ struct DisplayInfo {
 abstract contract Game {
     uint256 public gameType;
     uint256 public wager;
+    uint256 public result;
     address public host;
-    address public winner;
+//    address public winner;
     bool public isActive;
     Gambler[] public gamblers;
     
@@ -41,8 +43,21 @@ abstract contract Game {
     
     // 玩家加入游戏
     function join(address _gamblerAddress, uint256 _choice) public payable {
-        Gambler memory gambler = Gambler({id : _gamblerAddress, choice : _choice});
+        Gambler memory gambler = Gambler({id : _gamblerAddress, isWinner : false, choice : _choice});
         gamblers.push(gambler);
+    }
+    
+    function setResult(uint256 _result) public {
+        result = _result;
+    }
+    
+    function setWinner(address winner) public {
+        for (uint i = 0; i < gamblers.length; i++) {
+            Gambler storage gambler = gamblers[i];
+            if (gambler.id == winner) {
+                gambler.isWinner = true;
+            }
+        }
     }
  
     function isDefaultHost() public view returns (bool) {
@@ -57,7 +72,7 @@ abstract contract Game {
         address _bankRoll,
         address _winner,
         address _loser
-    ) internal returns (address) {
+    ) internal returns (bytes20) {
         IBankRoll bankRoll = IBankRoll(_bankRoll);
         uint256 refund = Vigorish.defaultHouseEdge(wager);
         if (_winner == _loser) {
@@ -70,22 +85,20 @@ abstract contract Game {
             bankRoll.gamePayout(payable(_winner), refund * 2);
         }
         isActive = false; // TODO：这里稍微有点延迟了
-        return _winner;
+        return bytes20(_winner);
     }
     
     // 游戏结果以及支付彩头
-    function play(address _bankRoll) public returns (address) {
+    function play(address _bankRoll) public returns (bytes20) {
         (address _winner, address _loser) = getWinnerAndLoser();
-        winner = _winner;
         return _play(_bankRoll, _winner, _loser);
     }
     
     function play(
         address _bankRoll,
         uint256[] memory _randomWords
-    ) public returns (address) {
+    ) public returns (bytes20) {
         (address _winner, address _loser) = getWinnerAndLoser(_randomWords);
-        winner = _winner;
         return _play(_bankRoll, _winner, _loser);
     }
     

@@ -41,7 +41,7 @@ contract Casino is VRFConsumerBaseV2 {
         bankRoll.init(msg.sender);
     }
     event CreateGame_Event(DisplayInfo game);
-    event CompleteGame_Event(address game, address winner);
+    event CompleteGame_Event(address game, bytes20 winner);
     event VrfRequest_Event(address game, uint256 requestId);
     event VrfResponse_Event(uint256 requestId, uint256[] randomWords);
 
@@ -105,7 +105,7 @@ contract Casino is VRFConsumerBaseV2 {
         address targetGame = address(game);
         // 游戏启动
         if (game.gameType() != DICE_GAME_TYPE && !game.isDefaultHost() ) {
-            address winner = game.play(address(bankRoll));
+            bytes20 winner = game.play(address(bankRoll));
             delete activeGameMap[targetGame];
             emit CompleteGame_Event(targetGame, winner);
         } else {
@@ -145,18 +145,19 @@ contract Casino is VRFConsumerBaseV2 {
     function fulfillRandomWords(uint256 _requestId, uint256[] memory _randomWords) internal override {
         emit VrfResponse_Event(_requestId, _randomWords);
         Game game = activeGameMap[vrfRequestIdGameMap[_requestId]];
-        address winner = game.play(address(bankRoll), _randomWords);
+        bytes20 winner = game.play(address(bankRoll), _randomWords);
         emit CompleteGame_Event(address(game), winner);
     }
 
     // 获取游戏列表
     // @returns array< DisplayInfo >
-    function getGames() public view returns (DisplayInfo[] memory allGames) {
+    function getGames() public view returns (DisplayInfo[] memory) {
         DisplayInfo[] memory allGames = new DisplayInfo[](games.length);
         for (uint256 i = 0; i < games.length; i++) {
             Game activeGame = activeGameMap[games[i]];
             allGames[i] = activeGame.getDisplayInfo();
         }
+        return allGames;
     }
     
     // 获取游戏信息

@@ -33,6 +33,7 @@ contract RockPaperScissors is Game {
             for (uint256 i = 0; i < gamblers.length; i++) {
                     displayGamblers[i] = Gambler({
                     id : gamblers[i].id,
+                    isWinner: false,
                     choice : DEFAULT_CHOICE
                 });
             }
