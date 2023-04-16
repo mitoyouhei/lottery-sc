@@ -87,8 +87,8 @@ abstract contract Game {
         } else {
             bankRoll.gamePayout(payable(_winner), refund * 2);
             isActive = false; // TODO：这里稍微有点延迟了
-            return GAME_DRAW;
-//            return bytes20(_winner);
+//            return GAME_DRAW;
+            return bytes20(_winner);
         }
     }
     
