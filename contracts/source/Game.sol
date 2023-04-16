@@ -9,6 +9,7 @@ uint256 constant DEFAULT_CHOICE = 0; // 保留值
 uint256 constant DICE_GAME_TYPE = 1; // 掷骰子
 uint256 constant ROCK_PAPER_SCISSORS_GAME_TYPE = 2; // 石头剪刀布
 address constant DEFAULT_GAME_HOST = address(0);
+bytes20 constant GAME_DRAW = bytes20("-");
 
 struct Gambler {
     address id;
@@ -81,11 +82,13 @@ abstract contract Game {
                     bankRoll.gamePayout(payable(gamblers[i].id), refund);
                 }
             }
+            isActive = false; // TODO：这里稍微有点延迟了
+            return GAME_DRAW;
         } else {
             bankRoll.gamePayout(payable(_winner), refund * 2);
+            isActive = false; // TODO：这里稍微有点延迟了
+            return bytes20(_winner);
         }
-        isActive = false; // TODO：这里稍微有点延迟了
-        return bytes20(_winner);
     }
     
     // 游戏结果以及支付彩头
