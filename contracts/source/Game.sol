@@ -3,6 +3,7 @@ pragma solidity >=0.8.18 <0.9.0;
 import "hardhat/console.sol";
 
 import "./BankRoll.sol";
+import "./vigorishLib.sol";
 
 uint256 constant DEFAULT_CHOICE = 0; // 保留值
 uint256 constant DICE_GAME_TYPE = 1; // 掷骰子
@@ -43,12 +44,7 @@ abstract contract Game {
         Gambler memory gambler = Gambler({id : _gamblerAddress, choice : _choice});
         gamblers.push(gambler);
     }
-    
-    // TODO 抽水
-    function customizeVigorish() public view returns (uint256) {
-        return (wager * 50) / 100;
-    }
-    
+ 
     function isDefaultHost() public view returns (bool) {
         return host == DEFAULT_GAME_HOST;
     }
@@ -63,7 +59,7 @@ abstract contract Game {
         address _loser
     ) internal returns (address) {
         IBankRoll bankRoll = IBankRoll(_bankRoll);
-        uint256 refund = wager - customizeVigorish();
+        uint256 refund = Vigorish.defaultHouseEdge(wager);
         if (_winner == _loser) {
             for (uint i = 0; i < gamblers.length; i++) {
                 if (gamblers[i].id != DEFAULT_GAME_HOST) {

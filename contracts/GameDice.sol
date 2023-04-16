@@ -4,7 +4,7 @@ import "hardhat/console.sol";
 
 import "./source/BankRoll.sol";
 import "./source/Game.sol";
-import "./source/GameWinner.sol";
+import "./source/gameWinnerLib.sol";
 
 contract Dice is Game {
     // 掷骰子游戏
