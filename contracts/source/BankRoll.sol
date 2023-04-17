@@ -86,8 +86,9 @@ contract BankRoll is IBankRoll {
     }
     
     function withdraw() public {
-        payable(owner).transfer(address(this).balance);
-        recordPayout(owner, EMPTY_ADDRESS, address(this).balance, OWNER_WITHDRAW);
+        uint256 bankrollBalance = address(this).balance;
+        payable(owner).transfer(bankrollBalance);
+        recordPayout(owner, EMPTY_ADDRESS, bankrollBalance, OWNER_WITHDRAW);
     }
     
     function deposit() public payable {
