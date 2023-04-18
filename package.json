@@ -8,7 +8,8 @@
     "coverage": "hardhat coverage",
     "deploy-mumbai": "hardhat run scripts/deploy.js --network mumbai",
     "deploy-polygon": "hardhat run scripts/deploy.js --network polygon",
-    "deploy-local": "hardhat run scripts/deploy.js --network ganache"
+    "deploy-local": "hardhat run scripts/deploy.js --network ganache",
+    "size": "npx hardhat size-contracts"
   },
   "repository": {
     "type": "git",
@@ -25,6 +26,7 @@
     "chai": "^4.3.7",
     "dotenv": "^16.0.3",
     "hardhat": "^2.12.6",
+    "hardhat-contract-sizer": "^2.8.0",
     "solidity-coverage": "^0.8.2"
   },
   "dependencies": {

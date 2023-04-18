@@ -1,46 +1,23 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity >=0.8.18 <0.9.0;
 import "hardhat/console.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-import "./BankRoll.sol";
-import "./Game.sol";
+import "./source/BankRoll.sol";
+import "./source/Game.sol";
+import "./source/gameWinnerLib.sol";
 
-contract Dice is Game, ReentrancyGuard {
+contract Dice is Game {
     // 掷骰子游戏
     // 选项: 点数, 1~6;
-    function init(uint256 customizeWager) public override {
-        super.init(customizeWager);
-        gameType = DICE_GAME_TYPE;
+    constructor(uint256 _gameType, address _host, uint256 _wager) Game (_gameType, _host, _wager){
     }
-
-    function getWinnerAndLoser()
-        public
-        override
-        nonReentrant
-        returns (address, address)
-    {
+    
+    function getWinnerAndLoser() public pure override returns (address, address){
         revert("Shouldn't call!");
     }
 
-    function getWinnerAndLoser(
-        uint256[] memory _randomWords
-    ) public override nonReentrant returns (address, address) {
-        require(gamblers.length == 2, "NEED_TWO_PLAYER");
-        Gambler memory gamblerA = gamblers[0];
-        Gambler memory gamblerB = gamblers[1];
-
-        uint256 roll = (_randomWords[0] % 6) + 1;
-
-        bool winnerIsBig = roll >= 4;
-        bool gamblerBIsBig = gamblerB.choice >= 4;
-        bool gamblerBIsWinner = (winnerIsBig && gamblerBIsBig) ||
-            (!winnerIsBig && !gamblerBIsBig);
-
-        return
-            gamblerBIsWinner
-                ? (gamblerB.id, gamblerA.id)
-                : (gamblerA.id, gamblerB.id);
+    function getWinnerAndLoser(uint256[] memory _randomWords) public override returns (address, address) {
+        return GameWinner.getWinnerAndLoserForDice(this, _randomWords);
     }
 
     function getDisplayInfo()
@@ -52,13 +29,11 @@ contract Dice is Game, ReentrancyGuard {
         return
             DisplayInfo({
                 id: address(this),
-                wager: wager,
                 gameType: gameType,
-                gamblers: gamblers
+                wager: wager,
+                isActive: isActive,
+                gamblers: gamblers,
+                host: host
             });
     }
-
-    // function playWithVRF() public view override {
-    //     require(gamblers.length == 2, "NEED_TWO_PLAYER");
-    // }
 }

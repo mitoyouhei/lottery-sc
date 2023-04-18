@@ -1,10 +1,19 @@
 require("@nomicfoundation/hardhat-toolbox");
 require("dotenv").config();
 require("solidity-coverage");
+require('hardhat-contract-sizer');
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
-  solidity: "0.8.19",
+  solidity: {
+    version: "0.8.19",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 1000, // default 200
+      },
+    },
+  },
   networks: {
     ganache: {
       url: process.env.GANACHE_URL,
@@ -23,4 +32,10 @@ module.exports = {
       accounts: [process.env.POLYGON_DEPLOY_ACCOUNT_PRIVATE_KEY],
     },
   },
-};
+  contractSizer: {
+    alphaSort: true,
+    disambiguatePaths: false,
+    runOnCompile: true,
+    strict: true,
+  }
+}

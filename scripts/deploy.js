@@ -9,7 +9,20 @@ async function main() {
   console.log("Account:", deployer.address);
   console.log("Account balance:", (await deployer.getBalance()).toString());
 
-  const Casino = await ethers.getContractFactory("Casino");
+  // Library deployment
+  const libGameWinner = await ethers.getContractFactory("GameWinner");
+  const libGameWinnerInstance = await libGameWinner.deploy();
+  console.log("libGameWinner address:", libGameWinnerInstance.address);
+  const vigorish = await ethers.getContractFactory("Vigorish");
+  const libvigorishInstance = await vigorish.deploy();
+  console.log("libVigorish address:", libvigorishInstance.address);
+
+  const Casino = await ethers.getContractFactory("Casino", {
+    libraries: {
+      GameWinner: libGameWinnerInstance.address,
+      Vigorish: libvigorishInstance.address,
+    }
+  });
   const vrfConfig = networkVrfConfigMap[network.name];
   console.log("VRF Config", vrfConfig);
   if(!vrfConfig) {
@@ -19,10 +32,10 @@ async function main() {
 
   const casino = await Casino.deploy(
     vrfConfig.keyHash,
-    vrfConfig.subId,
     vrfConfig.minimumRequestConfirmations,
     vrfConfig.callbackGasLimit,
     vrfConfig.numWords,
+    vrfConfig.subId,
     vrfConfig.VRFCoordinatorV2InterfaceAddress
   );
   console.log("Casino address:", casino.address);
