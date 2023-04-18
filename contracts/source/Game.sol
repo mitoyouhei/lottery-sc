@@ -75,19 +75,18 @@ abstract contract Game {
         address _loser
     ) internal returns (bytes20) {
         IBankRoll bankRoll = IBankRoll(_bankRoll);
-        uint256 refund = Vigorish.defaultHouseEdge(wager);
         if (_winner == _loser) {
             for (uint i = 0; i < gamblers.length; i++) {
                 if (gamblers[i].id != DEFAULT_GAME_HOST) {
-                    bankRoll.gamePayout(payable(gamblers[i].id), refund);
+                    bankRoll.gamePayout(payable(gamblers[i].id), wager);
                 }
             }
             isActive = false; // TODO：这里稍微有点延迟了
             return GAME_DRAW;
         } else {
-            bankRoll.gamePayout(payable(_winner), refund * 2);
+            uint256 refund = Vigorish.defaultHouseEdge(wager);
+            bankRoll.gamePayout(payable(_winner), refund + wager);
             isActive = false; // TODO：这里稍微有点延迟了
-//            return GAME_DRAW;
             return bytes20(_winner);
         }
     }
